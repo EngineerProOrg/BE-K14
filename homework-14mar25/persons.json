@@ -1,32 +1,27 @@
 [
   {
-    "Name": "Tom",
-    "JobTitle": "Software engineer",
-    "YearOfBirth": 1995
+    "name": "Tom",
+    "jobTitle": "Software engineer",
+    "yearOfBirth": 1995
   },
   {
-    "Name": "John Snow",
-    "JobTitle": "Teacher",
-    "YearOfBirth": 1997
+    "name": "John Snow",
+    "jobTitle": "Teacher",
+    "yearOfBirth": 1997
   },
   {
-    "Name": "Maria Onitsuka",
-    "JobTitle": "Actor",
-    "YearOfBirth": 1993
+    "name": "Maria Onitsuka",
+    "jobTitle": "Actor",
+    "yearOfBirth": 1993
   },
   {
-    "Name": "Emil",
-    "JobTitle": "Football player",
-    "YearOfBirth": 1987
+    "name": "Emily",
+    "jobTitle": "Football player",
+    "yearOfBirth": 1987
   },
   {
-    "Name": "Khanh Vuong Bui",
-    "JobTitle": "Senior .NET Developer",
-    "YearOfBirth": 1992
-  },
-  {
-    "Name": "Tran Thuy Trieu",
-    "JobTitle": "Medical Laboratory Technician",
-    "YearOfBirth": 1995
+    "name": "Khanh Vuong Bui",
+    "jobTitle": "Senior .NET Developer",
+    "yearOfBirth": 1992
   }
 ]

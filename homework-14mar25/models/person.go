@@ -10,9 +10,9 @@ import (
 )
 
 type Person struct {
-	Name        string
-	JobTitle    string
-	YearOfBirth int64
+	Name        string `json:"name"`
+	JobTitle    string `json:"jobTitle"`
+	YearOfBirth int64  `json:"yearOfBirth"`
 }
 
 func NewPerson(name string, jobTitle string, yearOfBirth int64) *Person {
@@ -38,6 +38,7 @@ func AddNewPerson(persons []*Person, name string, jobTitle string, yearOfBirth i
 
 func AddNewPersonsFromKeyBoard(currentPersons []*Person) []*Person {
 	var numberOfPersons int
+	fmt.Println("Zero means skip method")
 	fmt.Print("Enter your numbers of persons:")
 	fmt.Scan(&numberOfPersons)
 
@@ -78,6 +79,7 @@ func AddNewPersonsFromKeyBoard(currentPersons []*Person) []*Person {
 
 func UpdatePersonFromKeyBoard(updatedPersons []*Person) (*Person, error) {
 	var personIndex int
+	fmt.Println("Zero means skip method")
 	fmt.Print("Enter your person index:")
 	fmt.Scan(&personIndex)
 
