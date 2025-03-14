@@ -12,6 +12,7 @@ func main() {
 	persons, err := fileservice.ReadLines(constants.FileTxtPersons)
 	if err != nil {
 		fmt.Print(err)
+		return
 	}
 
 	models.PrintPersons(persons, "after reading file")
@@ -28,11 +29,13 @@ func main() {
 	err = fileservice.WriteFile(constants.FileJsonPersons, constants.FileJson, persons)
 	if err != nil {
 		fmt.Print(err)
+		return
 	}
 
 	outputPerson := fmt.Sprintf("output_%s", constants.FileTxtPersons)
 	err = fileservice.WriteFile(outputPerson, constants.FileTxt, persons)
 	if err != nil {
 		fmt.Print(err)
+		return
 	}
 }
