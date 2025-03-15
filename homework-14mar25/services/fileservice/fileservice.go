@@ -16,8 +16,7 @@ func ReadLines(filename string) ([]*models.Person, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Cannot open file:%s", filename)
-		fmt.Println(errorMessage)
-		return nil, err
+		return nil, errors.New(errorMessage)
 	}
 	defer file.Close()
 
@@ -27,10 +26,13 @@ func ReadLines(filename string) ([]*models.Person, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		parts := strings.Split(line, "|")
-		if parts == nil {
+		if len(parts) == 0 {
 			errorMessage := fmt.Sprintf("File: %s incorrect format. File must contain '|'", filename)
-			fmt.Println(errorMessage)
-			return nil, err
+			return nil, errors.New(errorMessage)
+		}
+
+		if len(parts[0]) == 0 || len(parts[1]) == 0 || len(parts[2]) == 0 {
+			return nil, errors.New("invalid index")
 		}
 
 		personName := parts[0]
@@ -38,8 +40,7 @@ func ReadLines(filename string) ([]*models.Person, error) {
 		personYearOfBirth, err := strconv.ParseInt(parts[2], 10, 64)
 		if err != nil {
 			errorMessage := fmt.Sprintf("Cannot parse this value:%v into integer", parts[2])
-			fmt.Println(errorMessage)
-			return nil, err
+			return nil, errors.New(errorMessage)
 		}
 
 		person := models.NewPerson(personName, personJobTitle, personYearOfBirth)
