@@ -1,0 +1,5 @@
+Tom|Vibe coder|1995
+John Snow|Teacher|1983
+Maria Onitsuka|Actor|1993
+Emil|Football player|1987
+Chris|Engineer|1990
