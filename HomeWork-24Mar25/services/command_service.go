@@ -22,7 +22,10 @@ func HandleUserInput() {
 
 		if strings.ToUpper(input) == "END" {
 			fmt.Println("Program terminated. Waiting for all users to finish...")
-			Wg.Wait() // Wait until all users complete bet
+			for i := 0; i < TotalInputs; i++ { // Wait until all users complete bet
+				<-DoneChan // Đợi từng người xử lý xong
+			}
+
 			fmt.Println("All bets processed. Exiting.")
 			break
 		}
@@ -48,11 +51,11 @@ func HandleUserInput() {
 		fmt.Printf("✅ Accepted bet of %d$ from User %s\n", bet, userID)
 
 		// Spawn a goroutine to handle bet
-		Wg.Add(1)
-		go func() {
-			defer Wg.Done()
-			handleSingleBet(userID, bet)
-		}()
+		TotalInputs++
+		go func(uid string, b int) {
+			handleSingleBet(uid, b)
+			DoneChan <- true
+		}(userID, bet)
 	}
 }
 
