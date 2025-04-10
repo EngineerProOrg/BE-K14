@@ -1,0 +1,8 @@
+POST http://localhost:8080/signup
+content-type: application/json
+
+{
+  "name": "User 002 - Global InfoTrack",
+  "email": "user002@infotrack.com.au",
+  "password": "P@ssword123"
+}
