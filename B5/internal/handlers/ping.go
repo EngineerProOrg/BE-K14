@@ -27,6 +27,15 @@ func (p *PingHandler) Handle(c *gin.Context) {
 		c.JSON(401, gin.H{"error": "Invalid Session"})
 		return
 	}
+	allowed, err := p.store.CheckRateLimit(c, username)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to check rate limit"})
+		return
+	}
+	if !allowed {
+		c.JSON(429, gin.H{"error": "Rate limit exceeded. Try again later."})
+		return
+	}
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	count, err := p.store.IncrementPingCount(c, username)
