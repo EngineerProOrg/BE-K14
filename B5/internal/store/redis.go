@@ -9,10 +9,16 @@ import (
 type RedisStore interface {
 	SaveSession(ctx context.Context, sessionID string, username string) error
 	GetSession(ctx context.Context, sessionID string) (string, error)
+	IncrementPingCount(ctx context.Context, username string) (int64, error)
 }
 
 type redisStore struct {
 	client *redis.Client
+}
+
+func (r redisStore) IncrementPingCount(ctx context.Context, username string) (int64, error) {
+	key := "ping_count" + username
+	return r.client.Incr(ctx, key).Result()
 }
 
 func (r redisStore) SaveSession(ctx context.Context, sessionID string, username string) error {

@@ -17,8 +17,23 @@ func NewPingHandler(store store.RedisStore) *PingHandler {
 }
 
 func (p *PingHandler) Handle(c *gin.Context) {
+	sessionID := c.GetHeader("X-Session-ID")
+	if sessionID == "" {
+		c.JSON(401, gin.H{"error": "No session ID provided"})
+		return
+	}
+	username, err := p.store.GetSession(c, sessionID)
+	if err != nil {
+		c.JSON(401, gin.H{"error": "Invalid Session"})
+		return
+	}
 	p.mu.Lock()
 	defer p.mu.Unlock()
+	count, err := p.store.IncrementPingCount(c, username)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to increment ping count"})
+		return
+	}
 	time.Sleep(5 * time.Second)
-	c.JSON(200, gin.H{"message": "pong"})
+	c.JSON(200, gin.H{"message": "pong", "count": count})
 }
