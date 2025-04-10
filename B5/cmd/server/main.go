@@ -9,8 +9,10 @@ import (
 func main() {
 	redisStore := store.NewRedisStore()
 	loginHandler := handlers.NewLoginHandler(redisStore)
+	pingHandler := handlers.NewPingHandler(redisStore)
 	router := gin.Default()
 	router.POST("/login", loginHandler.Handle)
+	router.POST("/ping", pingHandler.Handle)
 	err := router.Run(":8080")
 	if err != nil {
 		print(err)
