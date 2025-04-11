@@ -2,6 +2,7 @@ package main
 
 import (
 	"B5/internal/handlers"
+	"B5/internal/middleware"
 	"B5/internal/store"
 	"github.com/gin-gonic/gin"
 )
@@ -12,11 +13,20 @@ func main() {
 	pingHandler := handlers.NewPingHandler(redisStore)
 	topHandler := handlers.NewTopHandler(redisStore)
 	countHandler := handlers.NewCountHandler(redisStore)
+
+	sessionMiddleware := middleware.NewSessionMiddleware(redisStore)
+
 	router := gin.Default()
 	router.POST("/login", loginHandler.Handle)
-	router.POST("/ping", pingHandler.Handle)
-	router.GET("/top", topHandler.Handle)
-	router.GET("/count", countHandler.Handle)
+
+	protected := router.Group("/")
+	protected.Use(sessionMiddleware.ValidateSession())
+	{
+		protected.POST("/ping", pingHandler.Handle)
+		protected.GET("/top", topHandler.Handle)
+		protected.GET("/count", countHandler.Handle)
+	}
+
 	err := router.Run(":8080")
 	if err != nil {
 		print(err)

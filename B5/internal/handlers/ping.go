@@ -17,16 +17,7 @@ func NewPingHandler(store store.RedisStore) *PingHandler {
 }
 
 func (p *PingHandler) Handle(c *gin.Context) {
-	sessionID := c.GetHeader("X-Session-ID")
-	if sessionID == "" {
-		c.JSON(401, gin.H{"error": "No session ID provided"})
-		return
-	}
-	username, err := p.store.GetSession(c, sessionID)
-	if err != nil {
-		c.JSON(401, gin.H{"error": "Invalid Session"})
-		return
-	}
+	username := c.GetString("username")
 	allowed, err := p.store.CheckRateLimit(c, username)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to check rate limit"})
