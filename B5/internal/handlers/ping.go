@@ -18,15 +18,6 @@ func NewPingHandler(store store.RedisStore) *PingHandler {
 
 func (p *PingHandler) Handle(c *gin.Context) {
 	username := c.GetString("username")
-	allowed, err := p.store.CheckRateLimit(c, username)
-	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to check rate limit"})
-		return
-	}
-	if !allowed {
-		c.JSON(429, gin.H{"error": "Rate limit exceeded. Try again later."})
-		return
-	}
 	if err := p.store.AddUserToHLL(c, username); err != nil {
 		c.JSON(500, gin.H{"errors": "Failed to update unique users count"})
 		return

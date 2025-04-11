@@ -18,7 +18,7 @@ type RedisStore interface {
 	SaveSession(ctx context.Context, sessionID string, username string) error
 	GetSession(ctx context.Context, sessionID string) (string, error)
 	IncrementPingCount(ctx context.Context, username string) (int64, error)
-	CheckRateLimit(ctx context.Context, username string) (bool, error)
+	CheckRateLimit(ctx context.Context, username string, limit int, window time.Duration) (bool, error)
 	GetTopUsers(ctx context.Context, limit int) ([]UserCount, error)
 	AddUserToHLL(ctx context.Context, username string) error
 	GetUniqueUsersCount(ctx context.Context) (int64, error)
@@ -60,16 +60,16 @@ func (r redisStore) GetSession(ctx context.Context, sessionID string) (string, e
 	return r.client.Get(ctx, sessionPrefix+sessionID).Result()
 }
 
-func (r redisStore) CheckRateLimit(ctx context.Context, username string) (bool, error) {
+func (r redisStore) CheckRateLimit(ctx context.Context, username string, limit int, window time.Duration) (bool, error) {
 	key := fmt.Sprintf(rateLimitKey, username)
 	count, err := r.client.Incr(ctx, key).Result()
 	if err != nil {
 		return false, nil
 	}
 	if count == 1 {
-		r.client.Expire(ctx, key, 60*time.Second)
+		r.client.Expire(ctx, key, window)
 	}
-	return count <= 2, nil
+	return count <= int64(limit), nil
 }
 
 func (r redisStore) GetTopUsers(ctx context.Context, limit int) ([]UserCount, error) {
@@ -86,11 +86,11 @@ func (r redisStore) GetTopUsers(ctx context.Context, limit int) ([]UserCount, er
 	}
 	return topUsers, nil
 }
-func NewRedisStore() *redisStore {
+func NewRedisStore(addr string, password string, db int) *redisStore {
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
+		Addr:     addr,
+		Password: password,
+		DB:       db,
 	})
 	return &redisStore{client: client}
 }
