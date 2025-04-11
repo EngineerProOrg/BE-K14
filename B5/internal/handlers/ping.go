@@ -36,6 +36,10 @@ func (p *PingHandler) Handle(c *gin.Context) {
 		c.JSON(429, gin.H{"error": "Rate limit exceeded. Try again later."})
 		return
 	}
+	if err := p.store.AddUserToHLL(c, username); err != nil {
+		c.JSON(500, gin.H{"errors": "Failed to update unique users count"})
+		return
+	}
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	count, err := p.store.IncrementPingCount(c, username)

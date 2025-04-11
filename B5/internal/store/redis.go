@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	sessionPrefix = "session:"
-	pingCountKey  = "ping_counts"
-	rateLimitKey  = "rate_limit:%s"
+	sessionPrefix  = "session:"
+	pingCountKey   = "ping_counts"
+	rateLimitKey   = "rate_limit:%s"
+	uniqueUsersKey = "unique_users_hll"
 )
 
 type RedisStore interface {
@@ -19,6 +20,8 @@ type RedisStore interface {
 	IncrementPingCount(ctx context.Context, username string) (int64, error)
 	CheckRateLimit(ctx context.Context, username string) (bool, error)
 	GetTopUsers(ctx context.Context, limit int) ([]UserCount, error)
+	AddUserToHLL(ctx context.Context, username string) error
+	GetUniqueUsersCount(ctx context.Context) (int64, error)
 }
 type UserCount struct {
 	Username string `json:"username"`
@@ -27,6 +30,14 @@ type UserCount struct {
 
 type redisStore struct {
 	client *redis.Client
+}
+
+func (r redisStore) AddUserToHLL(ctx context.Context, username string) error {
+	return r.client.PFAdd(ctx, uniqueUsersKey, username).Err()
+}
+
+func (r redisStore) GetUniqueUsersCount(ctx context.Context) (int64, error) {
+	return r.client.PFCount(ctx, uniqueUsersKey).Result()
 }
 
 func (r redisStore) IncrementPingCount(ctx context.Context, username string) (int64, error) {
