@@ -45,5 +45,34 @@ func LoginIn(context *gin.Context) {
 	}
 
 	context.SetCookie("session_id", sessionId, 3600, "/", "", false, true)
+
 	context.JSON(http.StatusOK, gin.H{"message": "Login success"})
+}
+
+func Ping(context *gin.Context) {
+	httpStatusCode, err := services.Ping(context)
+	if err != nil {
+		context.JSON(httpStatusCode, gin.H{"error": err.Error()})
+		return
+	}
+	context.JSON(httpStatusCode, gin.H{"message": "Ping"})
+}
+
+func GetTop(context *gin.Context) {
+	leaderBoardEntries, err := services.GetTopPingers(context)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{"leaders": leaderBoardEntries})
+}
+
+func GetPingUserCount(context *gin.Context) {
+	count, err := services.GetPingUserCount(context)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"unique_ping_users": count})
 }

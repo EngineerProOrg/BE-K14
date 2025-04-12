@@ -13,4 +13,7 @@ func RegisterRoutes(ginEngine *gin.Engine) {
 func registerUserRoute(ginEngine *gin.Engine) {
 	ginEngine.POST("/signup", controllers.SignUp)
 	ginEngine.POST("/login", controllers.LoginIn)
+	ginEngine.GET("/ping", controllers.Ping)
+	ginEngine.GET("/top", controllers.GetTop)
+	ginEngine.GET("/pingCount", controllers.GetPingUserCount)
 }

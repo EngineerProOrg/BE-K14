@@ -65,7 +65,9 @@ func seedSampleUserData() {
 		VALUES 
 			('User 001 - Global InfoTrack','user001@infotrack.com.au', ?, datetime('now'), null),
 			('User 002 - Global InfoTrack','user002@infotrack.com.au', ?, datetime('now'), null),
-			('User 003 - Global InfoTrack','user003@infotrack.com.au', ?, datetime('now'), null)`
+			('User 003 - Global InfoTrack','user003@infotrack.com.au', ?, datetime('now'), null),
+			('User 004 - Global InfoTrack','user004@infotrack.com.au', ?, datetime('now'), null),
+			('User 005 - Global InfoTrack','user005@infotrack.com.au', ?, datetime('now'), null)`
 	stmt, err := DbContext.Prepare(insertQuery)
 	if err != nil {
 		fmt.Printf("❌ Could not seed sample data. Error: %v", err)
@@ -73,7 +75,12 @@ func seedSampleUserData() {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(exampleHashPassword, exampleHashPassword, exampleHashPassword)
+	_, err = stmt.Exec(exampleHashPassword,
+		exampleHashPassword,
+		exampleHashPassword,
+		exampleHashPassword,
+		exampleHashPassword)
+
 	if err != nil {
 		fmt.Printf("❌ Could not execute query. Error: %v", err)
 		return

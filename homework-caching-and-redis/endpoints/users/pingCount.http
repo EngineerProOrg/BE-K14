@@ -1,0 +1,2 @@
+GET http://localhost:8080/pingCount
+content-type: application/json
