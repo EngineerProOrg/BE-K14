@@ -19,7 +19,7 @@ func setupMySqlDatabase() {
 		return
 	}
 	// Init MySql
-	databases.InitSocialMediaDbContext()
+	databases.InitGormContext()
 }
 
 func setupRedisClient() {

@@ -1,0 +1,80 @@
+package databases
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"social-media/models"
+	"social-media/utils"
+	"time"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+var GormDb *gorm.DB
+
+func InitGormContext() {
+	user := os.Getenv("MYSQL_USER")
+	pass := os.Getenv("MYSQL_PASSWORD")
+	host := os.Getenv("MYSQL_HOST")
+	port := os.Getenv("MYSQL_PORT")
+	dbname := os.Getenv("MYSQL_DB")
+
+	if user == "" || pass == "" || host == "" || port == "" || dbname == "" {
+		log.Fatal("❌ Missing MySQL environment variables")
+	}
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		user, pass, host, port, dbname)
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("❌ Failed to connect to MySQL via GORM: %v", err)
+	}
+	log.Println("✅ Connected to MySQL via GORM!")
+
+	// Auto-migrate models
+	err = db.AutoMigrate(
+		&models.User{},
+		&models.Post{},
+		&models.Like{},
+		&models.Comment{},
+		&models.Follow{},
+	)
+	if err != nil {
+		log.Fatalf("❌ Auto migration failed: %v", err)
+	}
+
+	GormDb = db
+	seedSampleUserData(db)
+}
+
+func seedSampleUserData(db *gorm.DB) {
+	var count int64
+	if err := db.Model(&models.User{}).Count(&count).Error; err != nil {
+		log.Printf("❌ Failed to count users: %v\n", err)
+		return
+	}
+
+	if count > 0 {
+		log.Println("✅ Users table already has data. Skipping seeding.")
+		return
+	}
+
+	hash, _ := utils.HashPassword("P@ssword123")
+	users := []models.User{
+		{Name: "User 001 - Global InfoTrack", Email: "user001@infotrack.com.au", Password: hash, CreatedAt: time.Now()},
+		{Name: "User 002 - Global InfoTrack", Email: "user002@infotrack.com.au", Password: hash, CreatedAt: time.Now()},
+		{Name: "User 003 - Global InfoTrack", Email: "user003@infotrack.com.au", Password: hash, CreatedAt: time.Now()},
+		{Name: "User 004 - Global InfoTrack", Email: "user004@infotrack.com.au", Password: hash, CreatedAt: time.Now()},
+		{Name: "User 005 - Global InfoTrack", Email: "user005@infotrack.com.au", Password: hash, CreatedAt: time.Now()},
+	}
+
+	if err := db.Create(&users).Error; err != nil {
+		log.Printf("❌ Failed to seed users: %v\n", err)
+		return
+	}
+
+	log.Println("✅ Successfully seeded sample users.")
+}
