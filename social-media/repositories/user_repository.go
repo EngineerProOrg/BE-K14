@@ -1,1 +1,45 @@
 package repositories
+
+import (
+	"errors"
+	"fmt"
+	"social-media/models"
+	"social-media/repositories/databases"
+	"social-media/utils"
+
+	"gorm.io/gorm"
+)
+
+func Signup(user *models.User) error {
+	email := user.Email
+	isEmailExisted, err := CheckEmailExist(email)
+	if err == nil && isEmailExisted {
+		return fmt.Errorf("email %s has been registered", email)
+	}
+
+	return databases.GormDb.Create(user).Error
+}
+
+func CheckEmailExist(email string) (bool, error) {
+	var count int64
+	err := databases.GormDb.Model(&models.User{}).Where("email = ?", email).Count(&count).Error
+	if err != nil {
+		return false, err // db error
+	}
+	return count > 0, nil // email already registered
+}
+
+func Signin(userInput *models.User) error {
+	var userData models.User
+	err := databases.GormDb.Model(&models.User{}).Where("email = ?", userInput.Email).First(&userData).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("email or password is incorrect")
+		}
+		return err
+	}
+	if !utils.CheckPasswordHash(userInput.Password, userData.Password) {
+		return fmt.Errorf("email or password is incorrect")
+	}
+	return nil
+}

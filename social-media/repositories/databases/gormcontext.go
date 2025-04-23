@@ -64,11 +64,11 @@ func seedSampleUserData(db *gorm.DB) {
 
 	hash, _ := utils.HashPassword("P@ssword123")
 	users := []models.User{
-		{Name: "User 001 - Global InfoTrack", Email: "user001@infotrack.com.au", Password: hash, CreatedAt: time.Now()},
-		{Name: "User 002 - Global InfoTrack", Email: "user002@infotrack.com.au", Password: hash, CreatedAt: time.Now()},
-		{Name: "User 003 - Global InfoTrack", Email: "user003@infotrack.com.au", Password: hash, CreatedAt: time.Now()},
-		{Name: "User 004 - Global InfoTrack", Email: "user004@infotrack.com.au", Password: hash, CreatedAt: time.Now()},
-		{Name: "User 005 - Global InfoTrack", Email: "user005@infotrack.com.au", Password: hash, CreatedAt: time.Now()},
+		{Name: "User 001 - Global InfoTrack", Email: "user001@infotrack.com.au", Password: hash, CreatedAt: time.Now(), UpdatedAt: nil},
+		{Name: "User 002 - Global InfoTrack", Email: "user002@infotrack.com.au", Password: hash, CreatedAt: time.Now(), UpdatedAt: nil},
+		{Name: "User 003 - Global InfoTrack", Email: "user003@infotrack.com.au", Password: hash, CreatedAt: time.Now(), UpdatedAt: nil},
+		{Name: "User 004 - Global InfoTrack", Email: "user004@infotrack.com.au", Password: hash, CreatedAt: time.Now(), UpdatedAt: nil},
+		{Name: "User 005 - Global InfoTrack", Email: "user005@infotrack.com.au", Password: hash, CreatedAt: time.Now(), UpdatedAt: nil},
 	}
 
 	if err := db.Create(&users).Error; err != nil {
