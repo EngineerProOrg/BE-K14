@@ -43,3 +43,17 @@ func Signin(userInput *models.User) error {
 	}
 	return nil
 }
+
+func GetUserProfile(userId int64) (*models.User, error) {
+	var user *models.User
+	err := databases.GormDb.Unscoped().First(&user, userId).Error
+	if err != nil {
+		return nil, fmt.Errorf("user does not exist")
+	}
+
+	return user, nil
+}
+
+func UpdateUserProfile(userId int64, updates map[string]interface{}) error {
+	return databases.GormDb.Model(&models.User{}).Where("id = ?", userId).Updates(updates).Error
+}

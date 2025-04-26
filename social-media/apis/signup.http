@@ -1,8 +1,10 @@
-POST http://localhost:8080/api/v1/users
+POST http://localhost:8080/api/v1/users/signup
 content-type: application/json
 
 {
-  "name": "User 006 - Global InfoTrack",
-  "email": "user006@infotrack.com.au",
-  "password": "P@ssword123"
+  "firstName": "User 007",
+  "lastName": "Global InfoTrack",
+  "birthday": "1995-05-19T00:00:00Z",
+  "email": "user007@infotrack.com.au",
+  "password": "P@ssword123" 
 }
