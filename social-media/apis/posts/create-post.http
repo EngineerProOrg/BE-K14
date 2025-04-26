@@ -1,0 +1,9 @@
+POST http://localhost:8080/api/v1/posts
+content-type: application/json
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwMDFAaW5mb3RyYWNrLmNvbS5hdSIsImV4cCI6MTc0NTY2NDMzMSwidXNlcklkIjowfQ.L5ANFuAvYciHNKiDGAMCDZnFduIInppsMHLFJvLxlnI
+
+{
+  "title": "Study Golang",
+  "content": "Go is an open source programming language that makes it simple to build secure, scalable systems.",
+  "userId": 1
+}

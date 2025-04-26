@@ -3,10 +3,9 @@ package models
 import "time"
 
 type PostViewModel struct {
-	Title     string    `json:"title" binding:"required"`
-	Content   string    `json:"content" binding:"required"`
-	UserId    int       `json:"userId" binding:"required"`
-	CreatedAt time.Time `json:"createdAt" binding:"required"`
+	Title   string `json:"title" binding:"required"`
+	Content string `json:"content" binding:"required"`
+	UserId  int    `json:"userId" binding:"required"`
 }
 
 // Db model
