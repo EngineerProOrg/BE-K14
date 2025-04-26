@@ -8,16 +8,23 @@ import (
 )
 
 func RegisterRoutes(engine *gin.Engine) {
-	registerUserRoutes(engine)
+	apiGroup := engine.Group("/api/v1")
+
+	registerPublicRoutes(apiGroup)
+	registerProtectedRoutes(apiGroup)
 }
 
-func registerUserRoutes(ginEngine *gin.Engine) {
-	userGroup := ginEngine.Group("api/v1")
-	userGroup.POST("/users/signup", controllers.Signup)
-	userGroup.POST("/users/signin", controllers.Signin)
+func registerPublicRoutes(router *gin.RouterGroup) {
+	// Public routes none authen
+	router.POST("/users/signup", controllers.Signup)
+	router.POST("/users/signin", controllers.Signin)
+}
 
-	// Call middleware
-	userGroup.Use(middlewares.Authenticate)
-	userGroup.GET("/users/profile/:userId", controllers.GetUserProfile)
-	userGroup.PUT("/users/profile/:userId", controllers.EditUserProfile)
+func registerProtectedRoutes(router *gin.RouterGroup) {
+	// Protected routes (must Auth)
+	protected := router.Group("")
+	protected.Use(middlewares.Authenticate)
+
+	protected.GET("/users/profile/:userId", controllers.GetUserProfile)
+	protected.PUT("/users/profile/:userId", controllers.EditUserProfile)
 }

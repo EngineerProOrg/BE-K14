@@ -44,7 +44,7 @@ type User struct {
 	UpdatedAt *time.Time `gorm:"column:updated_at;autoUpdateTime:false"`
 }
 
-func CreateMappingUserSignupViewModelToUserEntity(vm *UserSignupViewModel) (*User, error) {
+func CreateMappingUserSignupViewModelToUserEntity(vm *UserSignupViewModel) *User {
 	return &User{
 		FirstName: vm.FirstName,
 		LastName:  vm.LastName,
@@ -53,7 +53,7 @@ func CreateMappingUserSignupViewModelToUserEntity(vm *UserSignupViewModel) (*Use
 		Email:     vm.Email,
 		Username:  utils.GetUsernameFromEmail(vm.Email),
 		Password:  vm.Password,
-	}, nil
+	}
 }
 
 func (u *User) CreateMapingUserEntityToCreateProfileViewModel() CreateUserProfileViewModel {

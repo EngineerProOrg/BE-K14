@@ -21,11 +21,7 @@ func Signup(context *gin.Context) {
 		return
 	}
 
-	user, err := models.CreateMappingUserSignupViewModelToUserEntity(userSignupViewModel)
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
-		return
-	}
+	user := models.CreateMappingUserSignupViewModelToUserEntity(userSignupViewModel)
 
 	err = services.Signup(user)
 	if err != nil {
