@@ -8,3 +8,7 @@ import (
 func CreatePost(post *models.Post) (*models.Post, error) {
 	return repositories.CreatePost(post)
 }
+
+func GetPostById(postId int64) (*models.Post, error) {
+	return repositories.GetPostById(postId)
+}

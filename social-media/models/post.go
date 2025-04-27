@@ -5,7 +5,7 @@ import "time"
 type PostViewModel struct {
 	Title   string `json:"title" binding:"required"`
 	Content string `json:"content" binding:"required"`
-	UserId  int    `json:"userId" binding:"required"`
+	UserId  int64  `json:"userId"`
 }
 
 // Db model
@@ -13,7 +13,7 @@ type Post struct {
 	Id        int        `gorm:"primaryKey;column:id"`
 	Title     string     `gorm:"column:title;size:500;not null"`
 	Content   string     `gorm:"column:content;type:text"`
-	UserId    int        `gorm:"column:user_id;not null"`
+	UserId    int64      `gorm:"column:user_id;not null"`
 	User      User       `gorm:"foreignKey:UserId"`
 	CreatedAt time.Time  `gorm:"column:created_at;not null"`
 	UpdatedAt *time.Time `gorm:"column:updated_at;autoUpdateTime:false"`
