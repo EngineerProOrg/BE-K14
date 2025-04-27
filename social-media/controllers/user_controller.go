@@ -60,6 +60,16 @@ func GetUserProfile(context *gin.Context) {
 		return
 	}
 
+	extractedUserId, ok := ExtractUserIdFromAccessToken(context)
+	if !ok {
+		return
+	}
+
+	if extractedUserId != userId {
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: userId mismatch"})
+		return
+	}
+
 	user, err := services.GetUserProfile(userId)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"error": err.Error(), "userId": userId})
@@ -74,6 +84,16 @@ func EditUserProfile(context *gin.Context) {
 	userId, err := strconv.ParseInt(context.Param("userId"), 10, 64)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "userId": userId})
+		return
+	}
+
+	extractedUserId, ok := ExtractUserIdFromAccessToken(context)
+	if !ok {
+		return
+	}
+
+	if extractedUserId != userId {
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: userId mismatch"})
 		return
 	}
 

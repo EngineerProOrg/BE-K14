@@ -10,7 +10,7 @@ import (
 )
 
 func CreatePost(context *gin.Context) {
-	postViewModel := &models.PostViewModel{}
+	postViewModel := &models.PostRequestViewModel{}
 
 	err := context.ShouldBindJSON(postViewModel)
 	if err != nil {
@@ -23,21 +23,15 @@ func CreatePost(context *gin.Context) {
 		return
 	}
 
-	postModel := models.CreateMappingPostViewModelToPostEntity(postViewModel)
+	postModel := models.CreateMappingPostRequestViewModelToPostEntity(postViewModel)
 	postModel.UserId = userId
 
-	createdPost, err := services.CreatePost(postModel)
+	responsePostvm, err := services.CreatePost(postModel)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	context.JSON(http.StatusCreated, gin.H{
-		"postId":    createdPost.Id,
-		"title":     createdPost.Title,
-		"content":   createdPost.Content,
-		"createdAt": createdPost.CreatedAt,
-		"author":    createdPost.User.Name,
-	})
+	context.JSON(http.StatusCreated, gin.H{"post": responsePostvm})
 }
 
 func GetPostById(context *gin.Context) {
@@ -47,16 +41,20 @@ func GetPostById(context *gin.Context) {
 		return
 	}
 
-	postModel, err := services.GetPostById(postId)
+	postResponse, err := services.GetPostById(postId)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"error": err.Error(), "postId": postId})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{
-		"postId":    postModel.Id,
-		"title":     postModel.Title,
-		"content":   postModel.Content,
-		"createdAt": postModel.CreatedAt,
-		"author":    postModel.User.Name,
-	})
+	context.JSON(http.StatusOK, gin.H{"post": postResponse})
+}
+
+func GetPosts(context *gin.Context) {
+	posts, err := services.GetPosts()
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"posts": posts})
 }

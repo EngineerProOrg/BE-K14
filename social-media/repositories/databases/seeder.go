@@ -1,0 +1,148 @@
+package databases
+
+import (
+	"log"
+	"social-media/models"
+	"social-media/utils"
+	"time"
+
+	"gorm.io/gorm"
+)
+
+func seedSampleUserData(db *gorm.DB) {
+	var count int64
+	if err := db.Model(&models.User{}).Count(&count).Error; err != nil {
+		log.Printf("❌ Failed to count users: %v\n", err)
+		return
+	}
+
+	if count > 0 {
+		log.Println("✅ Users table already has data. Skipping seeding.")
+		return
+	}
+
+	hash, _ := utils.HashPassword("P@ssword123")
+	users := []models.User{
+		{
+			FirstName: "User 001",
+			LastName:  "Global InfoTrack",
+			Name:      "User 001 - Global InfoTrack",
+			Birthday:  time.Date(2000, 8, 15, 0, 0, 0, 0, time.UTC),
+			Email:     "user001@infotrack.com.au",
+			Username:  utils.GetUsernameFromEmail("user001@infotrack.com.au"),
+			Password:  hash,
+			CreatedAt: time.Now(),
+			UpdatedAt: nil,
+		},
+		{
+			FirstName: "User 002",
+			LastName:  "Global InfoTrack",
+			Name:      "User 002 - Global InfoTrack",
+			Birthday:  time.Date(1998, 9, 11, 0, 0, 0, 0, time.UTC),
+			Email:     "user002@infotrack.com.au",
+			Username:  utils.GetUsernameFromEmail("user002@infotrack.com.au"),
+			Password:  hash,
+			CreatedAt: time.Now(),
+			UpdatedAt: nil,
+		},
+		{
+			FirstName: "User 003",
+			LastName:  "Global InfoTrack",
+			Name:      "User 003 - Global InfoTrack",
+			Birthday:  time.Date(1997, 11, 20, 0, 0, 0, 0, time.UTC),
+			Email:     "user003@infotrack.com.au",
+			Username:  utils.GetUsernameFromEmail("user003@infotrack.com.au"),
+			Password:  hash,
+			CreatedAt: time.Now(),
+			UpdatedAt: nil,
+		},
+		{
+			FirstName: "User 004",
+			LastName:  "Global InfoTrack",
+			Name:      "User 004 - Global InfoTrack",
+			Birthday:  time.Date(1999, 12, 24, 0, 0, 0, 0, time.UTC),
+			Email:     "user004@infotrack.com.au",
+			Username:  utils.GetUsernameFromEmail("user004@infotrack.com.au"),
+			Password:  hash,
+			CreatedAt: time.Now(),
+			UpdatedAt: nil,
+		},
+		{
+			FirstName: "User 005",
+			LastName:  "Global InfoTrack",
+			Name:      "User 005 - Global InfoTrack",
+			Birthday:  time.Date(1996, 10, 17, 0, 0, 0, 0, time.UTC),
+			Email:     "user005@infotrack.com.au",
+			Username:  utils.GetUsernameFromEmail("user005@infotrack.com.au"),
+			Password:  hash,
+			CreatedAt: time.Now(),
+			UpdatedAt: nil,
+		},
+	}
+
+	if err := db.Create(&users).Error; err != nil {
+		log.Printf("❌ Failed to seed users: %v\n", err)
+		return
+	}
+
+	log.Println("✅ Successfully seeded sample users.")
+}
+
+func seedSamplePostData(db *gorm.DB) {
+	var count int64
+	if err := db.Model(&models.Post{}).Count(&count).Error; err != nil {
+		log.Printf("❌ Failed to count posts: %v\n", err)
+		return
+	}
+
+	if count > 0 {
+		log.Println("✅ Posts table already has data. Skipping seeding.")
+		return
+	}
+
+	posts := []models.Post{
+		{
+			Title:     "Học Golang trong 30 ngày",
+			Content:   "Golang là một ngôn ngữ tuyệt vời cho backend.",
+			UserId:    1, // user 001
+			CreatedAt: time.Now(),
+		},
+		{
+			Title:     "Tại sao nên dùng GORM?",
+			Content:   "GORM giúp quản lý database trong Golang dễ dàng hơn nhiều.",
+			UserId:    1,
+			CreatedAt: time.Now(),
+		},
+		{
+			Title:     "Sự khác biệt giữa Gin và Echo",
+			Content:   "Gin có tốc độ tốt hơn trong nhiều benchmark.",
+			UserId:    2,
+			CreatedAt: time.Now(),
+		},
+		{
+			Title:     "Tạo RESTful API với Gin",
+			Content:   "Xây dựng API đơn giản và nhanh chóng với Gin framework.",
+			UserId:    3,
+			CreatedAt: time.Now(),
+		},
+		{
+			Title:     "Deploy Golang App lên Docker",
+			Content:   "Việc deploy Golang app vào container rất tiện lợi nhờ Docker.",
+			UserId:    4,
+			CreatedAt: time.Now(),
+		},
+		{
+			Title:     "Cách tối ưu GORM query",
+			Content:   "Để tránh N+1 query và tăng tốc độ, nên dùng Preload hoặc Joins.",
+			UserId:    5,
+			CreatedAt: time.Now(),
+		},
+	}
+
+	if err := db.Create(&posts).Error; err != nil {
+		log.Printf("❌ Failed to seed posts: %v\n", err)
+		return
+	}
+
+	log.Println("✅ Successfully seeded sample posts.")
+}

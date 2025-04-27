@@ -2,10 +2,23 @@ package models
 
 import "time"
 
-type PostViewModel struct {
+type PostRequestViewModel struct {
 	Title   string `json:"title" binding:"required"`
 	Content string `json:"content" binding:"required"`
 	UserId  int64  `json:"userId"`
+}
+
+type PostResponseViewModel struct {
+	PostId    int                    `json:"postId"`
+	Title     string                 `json:"title"`
+	Content   string                 `json:"content"`
+	CreatedAt time.Time              `json:"createdAt"`
+	Author    AuthorResponsViewModel `json:"author"`
+}
+
+type AuthorResponsViewModel struct {
+	Name     string `json:"name"`
+	Username string `json:"username"`
 }
 
 // Db model
@@ -19,11 +32,24 @@ type Post struct {
 	UpdatedAt *time.Time `gorm:"column:updated_at;autoUpdateTime:false"`
 }
 
-func CreateMappingPostViewModelToPostEntity(vm *PostViewModel) *Post {
+func CreateMappingPostRequestViewModelToPostEntity(vm *PostRequestViewModel) *Post {
 	return &Post{
 		Title:     vm.Title,
 		Content:   vm.Content,
 		UserId:    vm.UserId,
 		CreatedAt: time.Now(),
+	}
+}
+
+func (p *Post) CreateMappingPostEntityToPostResponseViewModel() *PostResponseViewModel {
+	return &PostResponseViewModel{
+		PostId:    p.Id,
+		Title:     p.Title,
+		Content:   p.Content,
+		CreatedAt: p.CreatedAt,
+		Author: AuthorResponsViewModel{
+			Name:     p.User.Name,
+			Username: p.User.Username,
+		},
 	}
 }

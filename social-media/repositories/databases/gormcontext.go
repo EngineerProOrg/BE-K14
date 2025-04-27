@@ -5,8 +5,6 @@ import (
 	"log"
 	"os"
 	"social-media/models"
-	"social-media/utils"
-	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -48,83 +46,5 @@ func InitGormContext() {
 
 	GormDb = db
 	seedSampleUserData(db)
-}
-
-func seedSampleUserData(db *gorm.DB) {
-	var count int64
-	if err := db.Model(&models.User{}).Count(&count).Error; err != nil {
-		log.Printf("❌ Failed to count users: %v\n", err)
-		return
-	}
-
-	if count > 0 {
-		log.Println("✅ Users table already has data. Skipping seeding.")
-		return
-	}
-
-	hash, _ := utils.HashPassword("P@ssword123")
-	users := []models.User{
-		{
-			FirstName: "User 001",
-			LastName:  "Global InfoTrack",
-			Name:      "User 001 - Global InfoTrack",
-			Birthday:  time.Date(2000, 8, 15, 0, 0, 0, 0, time.UTC),
-			Email:     "user001@infotrack.com.au",
-			Username:  utils.GetUsernameFromEmail("user001@infotrack.com.au"),
-			Password:  hash,
-			CreatedAt: time.Now(),
-			UpdatedAt: nil,
-		},
-		{
-			FirstName: "User 002",
-			LastName:  "Global InfoTrack",
-			Name:      "User 002 - Global InfoTrack",
-			Birthday:  time.Date(1998, 9, 11, 0, 0, 0, 0, time.UTC),
-			Email:     "user002@infotrack.com.au",
-			Username:  utils.GetUsernameFromEmail("user002@infotrack.com.au"),
-			Password:  hash,
-			CreatedAt: time.Now(),
-			UpdatedAt: nil,
-		},
-		{
-			FirstName: "User 003",
-			LastName:  "Global InfoTrack",
-			Name:      "User 003 - Global InfoTrack",
-			Birthday:  time.Date(1997, 11, 20, 0, 0, 0, 0, time.UTC),
-			Email:     "user003@infotrack.com.au",
-			Username:  utils.GetUsernameFromEmail("user003@infotrack.com.au"),
-			Password:  hash,
-			CreatedAt: time.Now(),
-			UpdatedAt: nil,
-		},
-		{
-			FirstName: "User 004",
-			LastName:  "Global InfoTrack",
-			Name:      "User 004 - Global InfoTrack",
-			Birthday:  time.Date(1999, 12, 24, 0, 0, 0, 0, time.UTC),
-			Email:     "user004@infotrack.com.au",
-			Username:  utils.GetUsernameFromEmail("user004@infotrack.com.au"),
-			Password:  hash,
-			CreatedAt: time.Now(),
-			UpdatedAt: nil,
-		},
-		{
-			FirstName: "User 005",
-			LastName:  "Global InfoTrack",
-			Name:      "User 005 - Global InfoTrack",
-			Birthday:  time.Date(1996, 10, 17, 0, 0, 0, 0, time.UTC),
-			Email:     "user005@infotrack.com.au",
-			Username:  utils.GetUsernameFromEmail("user005@infotrack.com.au"),
-			Password:  hash,
-			CreatedAt: time.Now(),
-			UpdatedAt: nil,
-		},
-	}
-
-	if err := db.Create(&users).Error; err != nil {
-		log.Printf("❌ Failed to seed users: %v\n", err)
-		return
-	}
-
-	log.Println("✅ Successfully seeded sample users.")
+	seedSamplePostData(db)
 }

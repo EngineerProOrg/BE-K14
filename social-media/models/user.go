@@ -39,6 +39,7 @@ type User struct {
 	Birthday  time.Time  `gorm:"column:birthday;type:date"`
 	Email     string     `gorm:"column:email;size:255;unique;not null"`
 	Username  string     `gorm:"column:username;size:255;unique;not null"`
+	Avatar    *string    `gorm:"size:500"`
 	Password  string     `gorm:"column:password;size:255;not null"`
 	CreatedAt time.Time  `gorm:"column:created_at;not null"`
 	UpdatedAt *time.Time `gorm:"column:updated_at;autoUpdateTime:false"`

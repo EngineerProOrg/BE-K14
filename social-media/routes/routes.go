@@ -15,7 +15,7 @@ func RegisterRoutes(engine *gin.Engine) {
 }
 
 func registerPublicRoutes(router *gin.RouterGroup) {
-	// Public routes none authen
+	// Public routes without authen
 	router.POST("/users/signup", controllers.Signup)
 	router.POST("/users/signin", controllers.Signin)
 }
@@ -29,4 +29,6 @@ func registerProtectedRoutes(router *gin.RouterGroup) {
 	protected.PUT("/users/profile/:userId", controllers.EditUserProfile)
 
 	protected.POST("/posts", controllers.CreatePost)
+	protected.GET("/posts/:postId", controllers.GetPostById)
+	protected.GET("/posts", controllers.GetPosts)
 }

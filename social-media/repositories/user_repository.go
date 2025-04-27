@@ -49,7 +49,7 @@ func GetUserProfile(userId int64) (*models.User, error) {
 
 	// Best practice recommend by AI.
 	user := &models.User{}
-	err := databases.GormDb.Unscoped().First(&user, userId).Error
+	err := databases.GormDb.First(user, userId).Error
 	if err != nil {
 		return nil, fmt.Errorf("user does not exist")
 	}

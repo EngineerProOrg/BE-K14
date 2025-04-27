@@ -31,9 +31,21 @@ func GetPostById(postId int64) (*models.Post, error) {
 
 	postEntity := &models.Post{}
 
-	err := databases.GormDb.First(postEntity, postId)
+	err := databases.GormDb.Preload("User").First(postEntity, postId).Error // First yêu cầu truyền địa chỉ vùng nhớ pointer
 	if err != nil {
 		return nil, fmt.Errorf("post does not exist")
 	}
 	return postEntity, nil
+}
+
+func GetPosts() ([]models.Post, error) {
+	var posts []models.Post
+
+	//GORM chỉ ghi vào vùng nhớ gốc, nên mình phải truyền đúng địa chỉ vùng nhớ (&) cho nó
+	err := databases.GormDb.Preload("User").Order("created_at DESC").Find(&posts).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return posts, nil
 }
