@@ -39,17 +39,24 @@ func Signin(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse request data"})
 		return
 	}
-	err = services.Signin(userInput)
+	userSigninResponseVm, err := services.Signin(userInput)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	accessToken, err := utils.GenerateAccessToken(userInput.Email, userInput.ID)
+	sessionId, err := services.GenerateSessionId(context, userSigninResponseVm.UserId)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Could not store sessionId in Redis"})
+		return
+	}
+
+	accessToken, err := utils.GenerateAccessToken(userInput.Email, userSigninResponseVm.UserId)
 	if err != nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
+	context.SetCookie("session_id", sessionId, 3600, "/", "", false, true)
 	context.JSON(http.StatusOK, gin.H{"message": "success", "access_token": accessToken})
 }
 

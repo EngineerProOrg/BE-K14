@@ -15,8 +15,16 @@ func Signup(user *models.User) error {
 	return repositories.Signup(user)
 }
 
-func Signin(userInput *models.User) error {
-	return repositories.Signin(userInput)
+func Signin(userInput *models.User) (*models.UserSigninResponseViewModel, error) {
+	userModel, err := repositories.Signin(userInput)
+	userResponse := &models.UserSigninResponseViewModel{
+		FirstName: userModel.FirstName,
+		LastName:  userModel.LastName,
+		Birthday:  userModel.Birthday,
+		Email:     userModel.Email,
+		UserId:    userModel.ID,
+	}
+	return userResponse, err
 }
 
 func GetUserProfile(userId int64) (*models.User, error) {

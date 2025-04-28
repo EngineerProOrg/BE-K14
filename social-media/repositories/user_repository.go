@@ -29,19 +29,19 @@ func CheckEmailExist(email string) (bool, error) {
 	return count > 0, nil // email already registered
 }
 
-func Signin(userInput *models.User) error {
+func Signin(userInput *models.User) (*models.User, error) {
 	var userData models.User
 	err := databases.GormDb.Model(&models.User{}).Where("email = ?", userInput.Email).First(&userData).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("email or password is incorrect")
+			return nil, fmt.Errorf("email or password is incorrect")
 		}
-		return err
+		return nil, err
 	}
 	if !utils.CheckPasswordHash(userInput.Password, userData.Password) {
-		return fmt.Errorf("email or password is incorrect")
+		return nil, fmt.Errorf("email or password is incorrect")
 	}
-	return nil
+	return &userData, nil
 }
 
 func GetUserProfile(userId int64) (*models.User, error) {

@@ -14,6 +14,14 @@ type UserSignupViewModel struct {
 	Password  string    `json:"password" binding:"required"`
 }
 
+type UserSigninResponseViewModel struct {
+	FirstName string    `json:"firstName" binding:"required"`
+	LastName  string    `json:"lastName" binding:"required"`
+	Birthday  time.Time `json:"birthday" binding:"required"`
+	Email     string    `json:"email" binding:"required"`
+	UserId    int64     `json:"userid" binding:"required"`
+}
+
 type CreateUserProfileViewModel struct {
 	FullName  string    `json:"fullName" binding:"required"`
 	FirstName string    `json:"firstName" binding:"required"`
