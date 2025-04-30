@@ -60,3 +60,14 @@ func GetUserProfile(userId int64) (*models.User, error) {
 func UpdateUserProfile(userId int64, updates map[string]interface{}) error {
 	return databases.GormDb.Model(&models.User{}).Where("id = ?", userId).Updates(updates).Error
 }
+
+func CheckUserExist(userId int64) (*models.User, error) {
+	user := &models.User{}
+	err := databases.GormDb.First(&user, userId).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("user does not exist")
+	} else if err != nil {
+		return nil, err
+	}
+	return user, nil
+}

@@ -27,6 +27,7 @@ func registerProtectedRoutes(router *gin.RouterGroup) {
 
 	protected.GET("/users/profile/:userId", controllers.GetUserProfile)
 	protected.PUT("/users/profile/:userId", controllers.EditUserProfile)
+	protected.GET("/users/:userId/posts", controllers.GetPostsByUserId)
 
 	protected.POST("/posts", controllers.CreatePost)
 	protected.GET("/posts/:postId", controllers.GetPostById)

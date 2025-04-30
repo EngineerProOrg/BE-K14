@@ -58,3 +58,27 @@ func GetPosts(context *gin.Context) {
 
 	context.JSON(http.StatusOK, gin.H{"posts": posts})
 }
+
+func GetPostsByUserId(context *gin.Context) {
+	userId, err := strconv.ParseInt(context.Param("userId"), 10, 64)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "userId": userId})
+		return
+	}
+	extractedUserId, ok := ExtractUserIdFromAccessToken(context)
+	if !ok {
+		return
+	}
+	if extractedUserId != userId {
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: userId mismatch"})
+		return
+	}
+
+	postResponseVm, err := services.GetPostsByUserId(userId)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"posts": postResponseVm})
+}

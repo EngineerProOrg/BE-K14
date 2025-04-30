@@ -37,3 +37,21 @@ func GetPosts() ([]*models.PostResponseViewModel, error) {
 
 	return postResponses, nil
 }
+
+func GetPostsByUserId(userId int64) ([]*models.PostResponseViewModel, error) {
+	_, err := repositories.CheckUserExist(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	postEntites, err := repositories.GetPostsByUserId(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	postResponseVm := make([]*models.PostResponseViewModel, 0, len(postEntites))
+	for _, post := range postEntites {
+		postResponseVm = append(postResponseVm, post.CreateMappingPostEntityToPostResponseViewModel())
+	}
+	return postResponseVm, nil
+}
