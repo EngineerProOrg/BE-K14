@@ -1,3 +1,3 @@
-GET http://localhost:8080/api/v1/users/profile/5
+GET http://localhost:8080/api/v1/users/profile/1
 content-type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwMDVAaW5mb3RyYWNrLmNvbS5hdSIsImV4cCI6MTc0NjAzMzMwMywidXNlcklkIjo1fQ.485qaNw2yJueAeoJGNdISPSX_Vdxtq9_5fdrPCiMw0o
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwMDFAaW5mb3RyYWNrLmNvbS5hdSIsImV4cCI6MTc0NjAzNDEwNiwidXNlcklkIjoxfQ.2kK5wRl1OFjyrcjMG6YiSTdRz3FRaN0eGX_pSwqyiH8

@@ -31,6 +31,7 @@ func (c *Comment) CreateMappingCommentEntityAndCommentResponseViewModel() *Comme
 		CreatedAt: c.CreatedAt,
 		UpdateAt:  c.UpdatedAt,
 		Author: sharedmodels.UserBaseViewModel{
+			UserId:    c.UserId,
 			FirstName: c.User.FirstName,
 			LastName:  c.User.LastName,
 			Name:      c.User.Name,

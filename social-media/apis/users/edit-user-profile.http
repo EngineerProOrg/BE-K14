@@ -1,9 +1,9 @@
-PUT http://localhost:8080/api/v1/users/profile/9
+PUT http://localhost:8080/api/v1/users/profile/6
 content-type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwMDdAaW5mb3RyYWNrLmNvbS5hdSIsImV4cCI6MTc0NTY1NzcxMSwidXNlcklkIjowfQ.4aizyjLqxwLMbds41hIIlkqvw0R8KokpwKcGNK6pPeE
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwMDdAaW5mb3RyYWNrLmNvbS5hdSIsImV4cCI6MTc0NjAzNDAwNSwidXNlcklkIjo2fQ.hVXLnZVlNf07TqWMQk-ymnAiuailXMPlYatHuBbLP6Q
 
 {
-  "firstName": "User 009",
+  "firstName": "User 006",
   "lastName": "Global - InfoTrack",
   "birthday": "1995-05-20T00:00:00Z"
 }

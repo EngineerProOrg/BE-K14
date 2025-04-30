@@ -1,3 +1,3 @@
-GET http://localhost:8080/api/v1/posts/1
+GET http://localhost:8080/api/v1/posts/5
 content-type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwMDVAaW5mb3RyYWNrLmNvbS5hdSIsImV4cCI6MTc0NTc1MjEyNCwidXNlcklkIjowfQ.-04m3edZoe2v1et4AS8Y1AdxaC2CR9XvfvNreaqy3FA
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwMDFAaW5mb3RyYWNrLmNvbS5hdSIsImV4cCI6MTc0NjAzNDU0MiwidXNlcklkIjoxfQ.6dT9VdbsoXlLIwzJRYfiZZ2V-XGay5GuT68VALZ_cG0

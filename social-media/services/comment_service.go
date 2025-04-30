@@ -29,6 +29,7 @@ func GetCommentsByPostId(postId int64) ([]models.CommentResponseViewModel, error
 			Content:   c.Content,
 			CreatedAt: c.CreatedAt,
 			Author: sharedmodels.UserBaseViewModel{
+				UserId:    c.UserId,
 				FirstName: c.User.FirstName,
 				LastName:  c.User.LastName,
 				Name:      c.User.Name,

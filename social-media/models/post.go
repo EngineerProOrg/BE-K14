@@ -46,6 +46,7 @@ func (p *Post) CreateMappingPostEntityToPostResponseViewModel() *PostResponseVie
 		Content:   p.Content,
 		CreatedAt: p.CreatedAt,
 		Author: sharedmodels.UserBaseViewModel{
+			UserId:    p.UserId,
 			FirstName: p.User.FirstName,
 			LastName:  p.User.LastName,
 			Name:      p.User.Name,
