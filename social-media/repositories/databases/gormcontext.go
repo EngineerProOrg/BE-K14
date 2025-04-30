@@ -45,6 +45,10 @@ func InitGormContext() {
 	}
 
 	GormDb = db
+
+	//ClearAllData(db)
+
 	seedSampleUserData(db)
 	seedSamplePostData(db)
+	seedSampleCommentData(db)
 }

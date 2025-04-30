@@ -50,6 +50,7 @@ func Signin(context *gin.Context) {
 		context.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
+
 	context.JSON(http.StatusOK, gin.H{"message": "success", "access_token": accessToken})
 }
 

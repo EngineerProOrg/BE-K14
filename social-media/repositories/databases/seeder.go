@@ -146,3 +146,55 @@ func seedSamplePostData(db *gorm.DB) {
 
 	log.Println("✅ Successfully seeded sample posts.")
 }
+
+func seedSampleCommentData(db *gorm.DB) {
+	var count int64
+	if err := db.Model(&models.Comment{}).Count(&count).Error; err != nil {
+		log.Printf("❌ Failed to count comments: %v\n", err)
+		return
+	}
+	if count > 0 {
+		log.Println("✅ Comments table already has data. Skipping seeding.")
+		return
+	}
+
+	comments := []models.Comment{
+		{Content: "Bài viết rất hay!", UserId: 1, PostId: 1},
+		{Content: "Cảm ơn bạn đã chia sẻ.", UserId: 2, PostId: 1},
+		{Content: "Mình cũng đang học Golang đây!", UserId: 3, PostId: 2},
+		{Content: "Dễ hiểu quá 👍", UserId: 4, PostId: 2},
+		{Content: "Bài này hữu ích ghê.", UserId: 5, PostId: 3},
+	}
+
+	if err := db.Create(&comments).Error; err != nil {
+		log.Printf("❌ Failed to seed comments: %v\n", err)
+		return
+	}
+
+	log.Println("✅ Successfully seeded sample comments.")
+}
+
+func ClearAllData(db *gorm.DB) {
+	log.Println("🧹 Clearing all tables: Comments → Posts → Users")
+
+	// Xoá comment trước
+	if err := db.Exec("DELETE FROM comments").Error; err != nil {
+		log.Printf("❌ Failed to clear comments: %v\n", err)
+	} else {
+		log.Println("✅ Cleared comments")
+	}
+
+	// Xoá post
+	if err := db.Exec("DELETE FROM posts").Error; err != nil {
+		log.Printf("❌ Failed to clear posts: %v\n", err)
+	} else {
+		log.Println("✅ Cleared posts")
+	}
+
+	// Xoá user
+	if err := db.Exec("DELETE FROM users").Error; err != nil {
+		log.Printf("❌ Failed to clear users: %v\n", err)
+	} else {
+		log.Println("✅ Cleared users")
+	}
+}

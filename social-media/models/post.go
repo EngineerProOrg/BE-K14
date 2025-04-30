@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"social-media/models/sharedmodels"
+	"time"
+)
 
 type PostRequestViewModel struct {
 	Title   string `json:"title" binding:"required"`
@@ -9,16 +12,11 @@ type PostRequestViewModel struct {
 }
 
 type PostResponseViewModel struct {
-	PostId    int                    `json:"postId"`
-	Title     string                 `json:"title"`
-	Content   string                 `json:"content"`
-	CreatedAt time.Time              `json:"createdAt"`
-	Author    AuthorResponsViewModel `json:"author"`
-}
-
-type AuthorResponsViewModel struct {
-	Name     string `json:"name"`
-	Username string `json:"username"`
+	PostId    int                                `json:"postId"`
+	Title     string                             `json:"title"`
+	Content   string                             `json:"content"`
+	CreatedAt time.Time                          `json:"createdAt"`
+	Author    sharedmodels.UserResponseViewModel `json:"author"`
 }
 
 // Db model
@@ -47,7 +45,7 @@ func (p *Post) CreateMappingPostEntityToPostResponseViewModel() *PostResponseVie
 		Title:     p.Title,
 		Content:   p.Content,
 		CreatedAt: p.CreatedAt,
-		Author: AuthorResponsViewModel{
+		Author: sharedmodels.UserResponseViewModel{
 			Name:     p.User.Name,
 			Username: p.User.Username,
 		},

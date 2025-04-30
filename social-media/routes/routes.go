@@ -14,22 +14,29 @@ func RegisterRoutes(engine *gin.Engine) {
 	registerProtectedRoutes(apiGroup)
 }
 
+// Public routes without authen
 func registerPublicRoutes(router *gin.RouterGroup) {
-	// Public routes without authen
 	router.POST("/users/signup", controllers.Signup)
 	router.POST("/users/signin", controllers.Signin)
 }
 
+// Protected routes (must Auth)
 func registerProtectedRoutes(router *gin.RouterGroup) {
-	// Protected routes (must Auth)
 	protected := router.Group("")
 	protected.Use(middlewares.Authenticate)
 
+	// User endpoints
 	protected.GET("/users/profile/:userId", controllers.GetUserProfile)
 	protected.PUT("/users/profile/:userId", controllers.EditUserProfile)
 	protected.GET("/users/:userId/posts", controllers.GetPostsByUserId)
 
+	// Post endpoints
 	protected.POST("/posts", controllers.CreatePost)
 	protected.GET("/posts/:postId", controllers.GetPostById)
 	protected.GET("/posts", controllers.GetPosts)
+
+	// Comment endpoints
+	protected.POST("/posts/:postId/comments", controllers.CreateComment)
+	protected.GET("/posts/:postId/comments", controllers.GetCommentsByPostId)
+
 }
