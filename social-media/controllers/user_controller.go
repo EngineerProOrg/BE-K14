@@ -54,7 +54,6 @@ func Signin(context *gin.Context) {
 	// Cached user_info after login success
 	// Therefore, we can save time to querydb and don't need to call Preload("User")
 	services.SetCachedUserSignin(context, userSigninResponseVm.UserId, userSigninResponseVm)
-
 	context.JSON(http.StatusOK, gin.H{"message": "success", "access_token": accessToken})
 }
 

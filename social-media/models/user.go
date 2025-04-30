@@ -74,6 +74,7 @@ func MapEditUserProfileViewModelToUserDbModel(vm *EditUserProfileViewModel) map[
 func (u *User) MapUserDbModelToUserProfileViewModel() *UserSigninResponseViewModel {
 	return &UserSigninResponseViewModel{
 		sharedmodels.UserBaseViewModel{
+			UserId:    u.ID,
 			FirstName: u.FirstName,
 			LastName:  u.LastName,
 			Name:      u.Name,
@@ -87,9 +88,10 @@ func (u *User) MapUserDbModelToUserProfileViewModel() *UserSigninResponseViewMod
 func (u *User) MapUserDbModelToUserSigninResponseViewModel() *UserSigninResponseViewModel {
 	return &UserSigninResponseViewModel{
 		sharedmodels.UserBaseViewModel{
+			UserId:    u.ID,
 			FirstName: u.FirstName,
 			LastName:  u.LastName,
-			Name:      u.FirstName + " " + u.LastName,
+			Name:      u.Name,
 			Birthday:  u.Birthday,
 			Email:     u.Email,
 			Avatar:    u.Avatar,
