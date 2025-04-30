@@ -14,7 +14,7 @@
 - [x] Update user profile API
 
 💬 Comment System
-- [] Create Comment API
+- [X] Create Comment API
 - [] Get Comments by Post ID API
 
 ❤️ Like Feature

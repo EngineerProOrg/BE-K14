@@ -12,11 +12,11 @@ type PostRequestViewModel struct {
 }
 
 type PostResponseViewModel struct {
-	PostId    int                                `json:"postId"`
-	Title     string                             `json:"title"`
-	Content   string                             `json:"content"`
-	CreatedAt time.Time                          `json:"createdAt"`
-	Author    sharedmodels.UserResponseViewModel `json:"author"`
+	PostId    int                            `json:"postId"`
+	Title     string                         `json:"title"`
+	Content   string                         `json:"content"`
+	CreatedAt time.Time                      `json:"createdAt"`
+	Author    sharedmodels.UserBaseViewModel `json:"author"`
 }
 
 // Db model
@@ -45,9 +45,13 @@ func (p *Post) CreateMappingPostEntityToPostResponseViewModel() *PostResponseVie
 		Title:     p.Title,
 		Content:   p.Content,
 		CreatedAt: p.CreatedAt,
-		Author: sharedmodels.UserResponseViewModel{
-			Name:     p.User.Name,
-			Username: p.User.Username,
+		Author: sharedmodels.UserBaseViewModel{
+			FirstName: p.User.FirstName,
+			LastName:  p.User.LastName,
+			Name:      p.User.Name,
+			Birthday:  p.User.Birthday,
+			Email:     p.User.Email,
+			Avatar:    p.User.Avatar,
 		},
 	}
 }

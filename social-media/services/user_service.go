@@ -17,13 +17,9 @@ func Signup(user *models.User) error {
 
 func Signin(userInput *models.User) (*models.UserSigninResponseViewModel, error) {
 	userModel, err := repositories.Signin(userInput)
-	userResponse := &models.UserSigninResponseViewModel{
-		FirstName: userModel.FirstName,
-		LastName:  userModel.LastName,
-		Birthday:  userModel.Birthday,
-		Email:     userModel.Email,
-		UserId:    userModel.ID,
-	}
+
+	userResponse := userModel.MapUserDbModelToUserSigninResponseViewModel()
+
 	return userResponse, err
 }
 
@@ -32,7 +28,7 @@ func GetUserProfile(userId int64) (*models.User, error) {
 }
 
 func EditUserProfile(userId int64, vm *models.EditUserProfileViewModel) error {
-	updatedUser := models.MapEditUserProfileViewModelToUserEntity(vm)
+	updatedUser := models.MapEditUserProfileViewModelToUserDbModel(vm)
 
 	return repositories.UpdateUserProfile(userId, updatedUser)
 }

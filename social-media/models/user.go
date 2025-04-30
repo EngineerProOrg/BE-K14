@@ -1,41 +1,30 @@
 package models
 
 import (
+	"social-media/models/sharedmodels"
 	"social-media/utils"
 	"time"
 )
 
 // ViewModel
-type UserSignupViewModel struct {
-	FirstName string    `json:"firstName" binding:"required"`
-	LastName  string    `json:"lastName" binding:"required"`
-	Birthday  time.Time `json:"birthday" binding:"required"`
-	Email     string    `json:"email" binding:"required"`
-	Password  string    `json:"password" binding:"required"`
+type UserSignupRequestViewModel struct {
+	Password string `json:"password" binding:"required"`
+	sharedmodels.UserBaseViewModel
 }
 
 type UserSigninResponseViewModel struct {
-	FirstName string    `json:"firstName" binding:"required"`
-	LastName  string    `json:"lastName" binding:"required"`
-	Birthday  time.Time `json:"birthday" binding:"required"`
-	Email     string    `json:"email" binding:"required"`
-	UserId    int64     `json:"userid" binding:"required"`
+	sharedmodels.UserBaseViewModel
 }
 
-type CreateUserProfileViewModel struct {
-	FullName  string    `json:"fullName" binding:"required"`
-	FirstName string    `json:"firstName" binding:"required"`
-	LastName  string    `json:"lastName" binding:"required"`
-	Birthday  time.Time `json:"birthday" binding:"required"`
-	Email     string    `json:"email" binding:"required"`
-	Username  string    `json:"username" binding:"required"`
-	CreatedAt time.Time `json:"createdAt" binding:"required"`
+type UserProfileViewModel struct {
+	sharedmodels.UserBaseViewModel
 }
 
 type EditUserProfileViewModel struct {
 	FirstName *string    `json:"firstName"`
 	LastName  *string    `json:"lastName"`
 	Birthday  *time.Time `json:"birthday"`
+	Avatar    *string    `json:"avatar"`
 }
 
 // Db Model
@@ -53,7 +42,7 @@ type User struct {
 	UpdatedAt *time.Time `gorm:"column:updated_at;autoUpdateTime:false"`
 }
 
-func CreateMappingUserSignupViewModelToUserEntity(vm *UserSignupViewModel) *User {
+func MapUserSignupRequestViewModelToUserDbModel(vm *UserSignupRequestViewModel) *User {
 	return &User{
 		FirstName: vm.FirstName,
 		LastName:  vm.LastName,
@@ -65,19 +54,7 @@ func CreateMappingUserSignupViewModelToUserEntity(vm *UserSignupViewModel) *User
 	}
 }
 
-func (u *User) CreateMapingUserEntityToCreateProfileViewModel() CreateUserProfileViewModel {
-	return CreateUserProfileViewModel{
-		FullName:  u.Name,
-		FirstName: u.FirstName,
-		LastName:  u.LastName,
-		Birthday:  u.Birthday,
-		Email:     u.Email,
-		Username:  u.Username,
-		CreatedAt: u.CreatedAt,
-	}
-}
-
-func MapEditUserProfileViewModelToUserEntity(vm *EditUserProfileViewModel) map[string]interface{} {
+func MapEditUserProfileViewModelToUserDbModel(vm *EditUserProfileViewModel) map[string]interface{} {
 	updates := make(map[string]interface{})
 
 	if vm.FirstName != nil {
@@ -92,4 +69,30 @@ func MapEditUserProfileViewModelToUserEntity(vm *EditUserProfileViewModel) map[s
 	updates["updated_at"] = time.Now()
 	updates["name"] = *vm.FirstName + " " + *vm.LastName
 	return updates
+}
+
+func (u *User) MapUserDbModelToUserProfileViewModel() *UserSigninResponseViewModel {
+	return &UserSigninResponseViewModel{
+		sharedmodels.UserBaseViewModel{
+			FirstName: u.FirstName,
+			LastName:  u.LastName,
+			Name:      u.Name,
+			Birthday:  u.Birthday,
+			Email:     u.Email,
+			Avatar:    u.Avatar,
+		},
+	}
+}
+
+func (u *User) MapUserDbModelToUserSigninResponseViewModel() *UserSigninResponseViewModel {
+	return &UserSigninResponseViewModel{
+		sharedmodels.UserBaseViewModel{
+			FirstName: u.FirstName,
+			LastName:  u.LastName,
+			Name:      u.FirstName + " " + u.LastName,
+			Birthday:  u.Birthday,
+			Email:     u.Email,
+			Avatar:    u.Avatar,
+		},
+	}
 }

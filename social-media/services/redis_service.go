@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"social-media/models/sharedmodels"
+	"social-media/models"
 	"social-media/repositories/databases"
 	"time"
 
@@ -26,10 +26,10 @@ func GenerateSessionId(ginContext *gin.Context, userId int64) (string, error) {
 	return sessionID, nil
 }
 
-func SetCachedUserInfo(ginContext *gin.Context, userId int64, author sharedmodels.UserResponseViewModel) {
+func SetCachedUserSignin(ginContext *gin.Context, userId int64, userSigninResponseVm *models.UserSigninResponseViewModel) {
 	userInfoKey := fmt.Sprintf("user_info:%d", userId)
 
-	jsonBytes, err := json.Marshal(author)
+	jsonBytes, err := json.Marshal(userSigninResponseVm)
 	if err != nil {
 		log.Printf("❌ Failed to marshal author info: %v", err)
 		return
@@ -41,13 +41,13 @@ func SetCachedUserInfo(ginContext *gin.Context, userId int64, author sharedmodel
 	}
 }
 
-func GetCachedAuthor(ginContext *gin.Context, userId int64) (sharedmodels.UserResponseViewModel, error) {
+func GetCachedUserSignin(ginContext *gin.Context, userId int64) (models.UserSigninResponseViewModel, error) {
 	key := fmt.Sprintf("user_info:%d", userId)
 	val, err := databases.RedisClient.Get(ginContext, key).Result()
 	if err == redis.Nil {
 		// fallback to DB when we cannot find userinfo in redis
 	}
-	var author sharedmodels.UserResponseViewModel
-	_ = json.Unmarshal([]byte(val), &author)
-	return author, nil
+	var userSigninResponseVm models.UserSigninResponseViewModel
+	_ = json.Unmarshal([]byte(val), &userSigninResponseVm)
+	return userSigninResponseVm, nil
 }

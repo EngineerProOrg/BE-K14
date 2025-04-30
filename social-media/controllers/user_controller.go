@@ -13,7 +13,7 @@ import (
 func Signup(context *gin.Context) {
 	// notes var userSignupViewModel *models.UserSignupViewModel // khai báo con trỏ nhưng chưa gán địa chỉ
 
-	userSignupViewModel := &models.UserSignupViewModel{} // best practice -> Tạo struct mới rồi lấy địa chỉ luôn ->Đã trỏ tới 1 struct rỗng
+	userSignupViewModel := &models.UserSignupRequestViewModel{} // best practice -> Tạo struct mới rồi lấy địa chỉ luôn ->Đã trỏ tới 1 struct rỗng
 
 	err := context.ShouldBindJSON(userSignupViewModel)
 	if err != nil {
@@ -21,7 +21,7 @@ func Signup(context *gin.Context) {
 		return
 	}
 
-	user := models.CreateMappingUserSignupViewModelToUserEntity(userSignupViewModel)
+	user := models.MapUserSignupRequestViewModelToUserDbModel(userSignupViewModel)
 
 	err = services.Signup(user)
 	if err != nil {
@@ -51,6 +51,10 @@ func Signin(context *gin.Context) {
 		return
 	}
 
+	// Cached user_info after login success
+	// Therefore, we can save time to querydb and don't need to call Preload("User")
+	services.SetCachedUserSignin(context, userSigninResponseVm.UserId, userSigninResponseVm)
+
 	context.JSON(http.StatusOK, gin.H{"message": "success", "access_token": accessToken})
 }
 
@@ -77,7 +81,7 @@ func GetUserProfile(context *gin.Context) {
 		return
 	}
 
-	userProfile := user.CreateMapingUserEntityToCreateProfileViewModel()
+	userProfile := user.MapUserDbModelToUserProfileViewModel()
 	context.JSON(http.StatusOK, gin.H{"userProfile": userProfile})
 }
 

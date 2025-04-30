@@ -17,11 +17,11 @@ type Comment struct {
 }
 
 type CommentResponseViewModel struct {
-	Id        int64                              `json:"id"`
-	Content   string                             `json:"content"`
-	CreatedAt time.Time                          `json:"createdAt"`
-	UpdateAt  *time.Time                         `json:"updatedAt"`
-	Author    sharedmodels.UserResponseViewModel `json:"author"`
+	Id        int64                          `json:"id"`
+	Content   string                         `json:"content"`
+	CreatedAt time.Time                      `json:"createdAt"`
+	UpdateAt  *time.Time                     `json:"updatedAt"`
+	Author    sharedmodels.UserBaseViewModel `json:"author"`
 }
 
 func (c *Comment) CreateMappingCommentEntityAndCommentResponseViewModel() *CommentResponseViewModel {
@@ -30,9 +30,13 @@ func (c *Comment) CreateMappingCommentEntityAndCommentResponseViewModel() *Comme
 		Content:   c.Content,
 		CreatedAt: c.CreatedAt,
 		UpdateAt:  c.UpdatedAt,
-		Author: sharedmodels.UserResponseViewModel{
-			Name:     c.User.Name,
-			Username: c.User.Username,
+		Author: sharedmodels.UserBaseViewModel{
+			FirstName: c.User.FirstName,
+			LastName:  c.User.LastName,
+			Name:      c.User.Name,
+			Birthday:  c.User.Birthday,
+			Email:     c.User.Email,
+			Avatar:    c.User.Avatar,
 		},
 	}
 }

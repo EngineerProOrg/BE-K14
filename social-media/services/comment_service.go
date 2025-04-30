@@ -28,9 +28,13 @@ func GetCommentsByPostId(postId int64) ([]models.CommentResponseViewModel, error
 			Id:        int64(c.Id),
 			Content:   c.Content,
 			CreatedAt: c.CreatedAt,
-			Author: sharedmodels.UserResponseViewModel{
-				Name:     c.User.Name,
-				Username: c.User.Username,
+			Author: sharedmodels.UserBaseViewModel{
+				FirstName: c.User.FirstName,
+				LastName:  c.User.LastName,
+				Name:      c.User.Name,
+				Birthday:  c.User.Birthday,
+				Email:     c.User.Email,
+				Avatar:    c.User.Avatar,
 			},
 		}
 		commentVMs = append(commentVMs, vm)
