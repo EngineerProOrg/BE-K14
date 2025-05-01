@@ -39,7 +39,7 @@
   Endpoint: /comments/:id/like
 - [] Count Like Numbers of Post/Comment API       
   Endpoint: /posts/:id/likes or GET /comments/:id/likes
-- [] Check Like Stauts                            
+- [] Check Like Status                            
   Endpoint: /posts/:id/like-status
 
 🔗 Follow System (Coming soon)
