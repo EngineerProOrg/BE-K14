@@ -2,6 +2,7 @@ package models
 
 import "time"
 
+// Db models
 type Like struct {
 	Id        int        `gorm:"primaryKey"`
 	PostId    *int       `gorm:"column:post_id;"`    // use pointer to allow nullable
