@@ -30,7 +30,7 @@ type Post struct {
 	UpdatedAt *time.Time `gorm:"column:updated_at;autoUpdateTime:false"`
 }
 
-func CreateMappingPostRequestViewModelToPostEntity(vm *PostRequestViewModel) *Post {
+func MaplePostRequestViewModelToPostDbModel(vm *PostRequestViewModel) *Post {
 	return &Post{
 		Title:     vm.Title,
 		Content:   vm.Content,
@@ -39,7 +39,7 @@ func CreateMappingPostRequestViewModelToPostEntity(vm *PostRequestViewModel) *Po
 	}
 }
 
-func (p *Post) CreateMappingPostEntityToPostResponseViewModel() *PostResponseViewModel {
+func (p *Post) MapPostDbModelToPostResponseViewModel() *PostResponseViewModel {
 	return &PostResponseViewModel{
 		PostId:    p.Id,
 		Title:     p.Title,

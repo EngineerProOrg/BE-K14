@@ -15,20 +15,42 @@ func Signup(user *models.User) error {
 	return repositories.Signup(user)
 }
 
-func Signin(userInput *models.User) (*models.UserSigninResponseViewModel, error) {
+func Signin(userInput *models.User) (*models.UserProfileResponseViewModel, error) {
 	userModel, err := repositories.Signin(userInput)
+	if err != nil {
+		return nil, err
+	}
 
-	userResponse := userModel.MapUserDbModelToUserSigninResponseViewModel()
+	userResponse := userModel.MapUserDbModelToUserProfileResponseViewModel()
 
 	return userResponse, err
 }
 
-func GetUserProfile(userId int64) (*models.User, error) {
-	return repositories.GetUserProfile(userId)
+func GetUserProfile(userId int64) (*models.UserProfileResponseViewModel, error) {
+	userModel, err := repositories.GetUserProfile(userId)
+	if err != nil {
+		return nil, err
+	}
+	userResponse := userModel.MapUserDbModelToUserProfileResponseViewModel()
+	return userResponse, err
 }
 
-func EditUserProfile(userId int64, vm *models.EditUserProfileViewModel) error {
+func EditUserProfile(userId int64, vm *models.EditUserProfileRequestViewModel) (*models.UserProfileResponseViewModel, error) {
 	updatedUser := models.MapEditUserProfileViewModelToUserDbModel(vm)
 
-	return repositories.UpdateUserProfile(userId, updatedUser)
+	err := repositories.UpdateUserProfile(userId, updatedUser)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get latest user profile from db to cache
+	profile, err := GetUserProfile(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set cached
+	SetCachedUserInfo(nil, userId, profile)
+
+	return profile, nil
 }

@@ -12,15 +12,11 @@ type UserSignupRequestViewModel struct {
 	sharedmodels.UserBaseViewModel
 }
 
-type UserSigninResponseViewModel struct {
+type UserProfileResponseViewModel struct {
 	sharedmodels.UserBaseViewModel
 }
 
-type UserProfileViewModel struct {
-	sharedmodels.UserBaseViewModel
-}
-
-type EditUserProfileViewModel struct {
+type EditUserProfileRequestViewModel struct {
 	FirstName *string    `json:"firstName"`
 	LastName  *string    `json:"lastName"`
 	Birthday  *time.Time `json:"birthday"`
@@ -54,7 +50,7 @@ func MapUserSignupRequestViewModelToUserDbModel(vm *UserSignupRequestViewModel) 
 	}
 }
 
-func MapEditUserProfileViewModelToUserDbModel(vm *EditUserProfileViewModel) map[string]interface{} {
+func MapEditUserProfileViewModelToUserDbModel(vm *EditUserProfileRequestViewModel) map[string]interface{} {
 	updates := make(map[string]interface{})
 
 	if vm.FirstName != nil {
@@ -71,22 +67,8 @@ func MapEditUserProfileViewModelToUserDbModel(vm *EditUserProfileViewModel) map[
 	return updates
 }
 
-func (u *User) MapUserDbModelToUserProfileViewModel() *UserSigninResponseViewModel {
-	return &UserSigninResponseViewModel{
-		sharedmodels.UserBaseViewModel{
-			UserId:    u.ID,
-			FirstName: u.FirstName,
-			LastName:  u.LastName,
-			Name:      u.Name,
-			Birthday:  u.Birthday,
-			Email:     u.Email,
-			Avatar:    u.Avatar,
-		},
-	}
-}
-
-func (u *User) MapUserDbModelToUserSigninResponseViewModel() *UserSigninResponseViewModel {
-	return &UserSigninResponseViewModel{
+func (u *User) MapUserDbModelToUserProfileResponseViewModel() *UserProfileResponseViewModel {
+	return &UserProfileResponseViewModel{
 		sharedmodels.UserBaseViewModel{
 			UserId:    u.ID,
 			FirstName: u.FirstName,

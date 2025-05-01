@@ -41,7 +41,11 @@ func Signin(context *gin.Context) {
 	}
 	userSigninResponseVm, err := services.Signin(userInput)
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if err.Error() == "email or password is incorrect" {
+			context.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else {
+			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
@@ -53,7 +57,7 @@ func Signin(context *gin.Context) {
 
 	// Cached user_info after login success
 	// Therefore, we can save time to querydb and don't need to call Preload("User")
-	services.SetCachedUserSignin(context, userSigninResponseVm.UserId, userSigninResponseVm)
+	services.SetCachedUserInfo(context, userSigninResponseVm.UserId, userSigninResponseVm)
 	context.JSON(http.StatusOK, gin.H{"message": "success", "access_token": accessToken})
 }
 
@@ -74,14 +78,17 @@ func GetUserProfile(context *gin.Context) {
 		return
 	}
 
-	user, err := services.GetUserProfile(userId)
-	if err != nil {
-		context.JSON(http.StatusNotFound, gin.H{"error": err.Error(), "userId": userId})
-		return
-	}
+	var userSigninResponseVm *models.UserProfileResponseViewModel
 
-	userProfile := user.MapUserDbModelToUserProfileViewModel()
-	context.JSON(http.StatusOK, gin.H{"userProfile": userProfile})
+	userSigninResponseVm, err = services.GetCachedUserInfo(context, extractedUserId)
+	if err != nil {
+		userSigninResponseVm, err = services.GetUserProfile(userId)
+		if err != nil {
+			context.JSON(http.StatusNotFound, gin.H{"error": err.Error(), "userId": userId})
+			return
+		}
+	}
+	context.JSON(http.StatusOK, gin.H{"userProfile": userSigninResponseVm})
 }
 
 func EditUserProfile(context *gin.Context) {
@@ -107,17 +114,32 @@ func EditUserProfile(context *gin.Context) {
 		return
 	}
 
-	editUserProfile := &models.EditUserProfileViewModel{}
+	editUserProfile := &models.EditUserProfileRequestViewModel{}
 	err = context.ShouldBindJSON(editUserProfile)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse request data"})
 		return
 	}
 
-	err = services.EditUserProfile(userId, editUserProfile)
+	updatedProfile, err := services.EditUserProfile(userId, editUserProfile)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "userId": userId})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"message": "success"})
+	context.JSON(http.StatusOK, gin.H{"userInfo": updatedProfile})
+}
+
+func Signout(context *gin.Context) {
+	userId, ok := ExtractUserIdFromAccessToken(context)
+	if !ok {
+		return
+	}
+
+	err := services.DeleteCachedUserInfo(context, userId)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to sign out"})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Signed out successfully"})
 }

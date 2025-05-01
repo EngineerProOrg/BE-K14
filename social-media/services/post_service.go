@@ -10,7 +10,7 @@ func CreatePost(post *models.Post) (*models.PostResponseViewModel, error) {
 	if err != nil {
 		return nil, err
 	}
-	postResponseVm := postModel.CreateMappingPostEntityToPostResponseViewModel()
+	postResponseVm := postModel.MapPostDbModelToPostResponseViewModel()
 	return postResponseVm, nil
 }
 
@@ -20,7 +20,7 @@ func GetPostById(postId int64) (*models.PostResponseViewModel, error) {
 		return nil, err
 	}
 
-	postResponseVm := postModel.CreateMappingPostEntityToPostResponseViewModel()
+	postResponseVm := postModel.MapPostDbModelToPostResponseViewModel()
 	return postResponseVm, nil
 }
 
@@ -32,7 +32,7 @@ func GetPosts() ([]*models.PostResponseViewModel, error) {
 
 	postResponses := make([]*models.PostResponseViewModel, 0, len(postModels))
 	for _, post := range postModels {
-		postResponses = append(postResponses, post.CreateMappingPostEntityToPostResponseViewModel())
+		postResponses = append(postResponses, post.MapPostDbModelToPostResponseViewModel())
 	}
 
 	return postResponses, nil
@@ -51,7 +51,7 @@ func GetPostsByUserId(userId int64) ([]*models.PostResponseViewModel, error) {
 
 	postResponseVm := make([]*models.PostResponseViewModel, 0, len(postEntites))
 	for _, post := range postEntites {
-		postResponseVm = append(postResponseVm, post.CreateMappingPostEntityToPostResponseViewModel())
+		postResponseVm = append(postResponseVm, post.MapPostDbModelToPostResponseViewModel())
 	}
 	return postResponseVm, nil
 }

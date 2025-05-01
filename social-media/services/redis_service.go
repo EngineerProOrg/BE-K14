@@ -26,10 +26,10 @@ func GenerateSessionId(ginContext *gin.Context, userId int64) (string, error) {
 	return sessionID, nil
 }
 
-func SetCachedUserSignin(ginContext *gin.Context, userId int64, userSigninResponseVm *models.UserSigninResponseViewModel) {
+func SetCachedUserInfo(ginContext *gin.Context, userId int64, userProfileResponseVm *models.UserProfileResponseViewModel) {
 	userInfoKey := fmt.Sprintf("user_info:%d", userId)
 
-	jsonBytes, err := json.Marshal(userSigninResponseVm)
+	jsonBytes, err := json.Marshal(userProfileResponseVm)
 	if err != nil {
 		log.Printf("❌ Failed to marshal author info: %v", err)
 		return
@@ -41,13 +41,28 @@ func SetCachedUserSignin(ginContext *gin.Context, userId int64, userSigninRespon
 	}
 }
 
-func GetCachedUserSignin(ginContext *gin.Context, userId int64) (models.UserSigninResponseViewModel, error) {
+func GetCachedUserInfo(ginContext *gin.Context, userId int64) (*models.UserProfileResponseViewModel, error) {
 	key := fmt.Sprintf("user_info:%d", userId)
 	val, err := databases.RedisClient.Get(ginContext, key).Result()
-	if err == redis.Nil {
-		// fallback to DB when we cannot find userinfo in redis
+
+	if err != nil {
+		if err == redis.Nil {
+			return nil, fmt.Errorf("user not found in Redis")
+		}
+		return nil, fmt.Errorf("failed to get from Redis: %w", err)
 	}
-	var userSigninResponseVm models.UserSigninResponseViewModel
+
+	userSigninResponseVm := &models.UserProfileResponseViewModel{}
 	_ = json.Unmarshal([]byte(val), &userSigninResponseVm)
 	return userSigninResponseVm, nil
+}
+
+func DeleteCachedUserInfo(ctx *gin.Context, userId int64) error {
+	userInfoKey := fmt.Sprintf("user_info:%d", userId)
+	err := databases.RedisClient.Del(ctx, userInfoKey).Err()
+	if err != nil {
+		log.Printf("❌ Failed to delete cached user info for userId=%d: %v", userId, err)
+		return err
+	}
+	return nil
 }

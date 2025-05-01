@@ -23,7 +23,7 @@ func CreatePost(context *gin.Context) {
 		return
 	}
 
-	postModel := models.CreateMappingPostRequestViewModelToPostEntity(postViewModel)
+	postModel := models.MaplePostRequestViewModelToPostDbModel(postViewModel)
 	postModel.UserId = userId
 
 	responsePostvm, err := services.CreatePost(postModel)
