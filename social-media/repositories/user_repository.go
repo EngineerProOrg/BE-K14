@@ -34,12 +34,12 @@ func Signin(userInput *models.User) (*models.User, error) {
 	err := databases.GormDb.Model(&models.User{}).Where("email = ?", userInput.Email).First(&userData).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("email or password is incorrect")
+			return nil, utils.ErrInvalidLogin
 		}
 		return nil, err
 	}
 	if !utils.CheckPasswordHash(userInput.Password, userData.Password) {
-		return nil, fmt.Errorf("email or password is incorrect")
+		return nil, utils.ErrInvalidLogin
 	}
 	return &userData, nil
 }
@@ -51,7 +51,7 @@ func GetUserProfile(userId int64) (*models.User, error) {
 	user := &models.User{}
 	err := databases.GormDb.First(user, userId).Error
 	if err != nil {
-		return nil, fmt.Errorf("user does not exist")
+		return nil, utils.ErrUserDoesNotExist
 	}
 
 	return user, nil
@@ -65,7 +65,7 @@ func CheckUserExist(userId int64) (*models.User, error) {
 	user := &models.User{}
 	err := databases.GormDb.First(&user, userId).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, fmt.Errorf("user does not exist")
+		return nil, utils.ErrUserDoesNotExist
 	} else if err != nil {
 		return nil, err
 	}

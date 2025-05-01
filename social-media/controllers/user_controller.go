@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
 	"social-media/models"
 	"social-media/services"
@@ -41,7 +42,7 @@ func Signin(context *gin.Context) {
 	}
 	userSigninResponseVm, err := services.Signin(userInput)
 	if err != nil {
-		if err.Error() == "email or password is incorrect" {
+		if errors.Is(err, utils.ErrInvalidLogin) {
 			context.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		} else {
 			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
