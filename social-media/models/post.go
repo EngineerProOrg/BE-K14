@@ -30,7 +30,7 @@ type Post struct {
 	UpdatedAt *time.Time `gorm:"column:updated_at;autoUpdateTime:false"`
 }
 
-func MaplePostRequestViewModelToPostDbModel(vm *PostRequestViewModel) *Post {
+func MapPostRequestViewModelToPostDbModel(vm *PostRequestViewModel) *Post {
 	return &Post{
 		Title:     vm.Title,
 		Content:   vm.Content,

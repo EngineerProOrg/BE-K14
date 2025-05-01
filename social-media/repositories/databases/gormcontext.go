@@ -51,4 +51,5 @@ func InitGormContext() {
 	seedSampleUserData(db)
 	seedSamplePostData(db)
 	seedSampleCommentData(db)
+	seedSampleLikeData(db)
 }

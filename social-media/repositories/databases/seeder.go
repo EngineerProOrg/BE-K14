@@ -2,6 +2,7 @@ package databases
 
 import (
 	"log"
+	"social-media/constants"
 	"social-media/models"
 	"social-media/utils"
 	"time"
@@ -172,6 +173,45 @@ func seedSampleCommentData(db *gorm.DB) {
 	}
 
 	log.Println("✅ Successfully seeded sample comments.")
+}
+
+func seedSampleLikeData(db *gorm.DB) {
+	var count int64
+	if err := db.Model(&models.Like{}).Count(&count).Error; err != nil {
+		log.Printf("❌ Failed to count likes: %v\n", err)
+		return
+	}
+
+	if count > 0 {
+		log.Println("✅ Likes table already has data. Skipping seeding.")
+		return
+	}
+
+	likes := []models.Like{
+		// Likes on posts (PostId != nil, CommentId = nil)
+		{UserId: 2, PostId: ptrInt(1), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
+		{UserId: 3, PostId: ptrInt(1), ReactionType: constants.ReactionLove, CreatedAt: time.Now()},
+		{UserId: 1, PostId: ptrInt(2), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
+		{UserId: 4, PostId: ptrInt(3), ReactionType: constants.ReactionSad, CreatedAt: time.Now()},
+		{UserId: 5, PostId: ptrInt(3), ReactionType: constants.ReactionFire, CreatedAt: time.Now()},
+
+		// Likes on comments (CommentId != nil, PostId = nil)
+		{UserId: 1, CommentId: ptrInt(2), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
+		{UserId: 3, CommentId: ptrInt(3), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
+		{UserId: 4, CommentId: ptrInt(3), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
+		{UserId: 2, CommentId: ptrInt(5), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
+	}
+
+	if err := db.Create(&likes).Error; err != nil {
+		log.Printf("❌ Failed to seed likes: %v\n", err)
+		return
+	}
+
+	log.Println("✅ Successfully seeded sample likes.")
+}
+
+func ptrInt(i int) *int {
+	return &i
 }
 
 func ClearAllData(db *gorm.DB) {
