@@ -49,8 +49,5 @@ func EditUserProfile(userId int64, vm *models.EditUserProfileRequestViewModel) (
 		return nil, err
 	}
 
-	// Set cached
-	SetCachedUserInfo(nil, userId, profile)
-
 	return profile, nil
 }

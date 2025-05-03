@@ -126,6 +126,8 @@ func EditUserProfile(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "userId": userId})
 		return
 	}
+	// Set cached
+	services.SetCachedUserInfo(context, userId, updatedProfile)
 	context.JSON(http.StatusOK, gin.H{"userInfo": updatedProfile})
 }
 
