@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"social-media/models"
 	"social-media/services"
 	"strconv"
 
@@ -22,4 +23,20 @@ func GetReactionsByPostId(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, reactions)
+}
+
+func CreateOrUpdateReaction(context *gin.Context) {
+	extractedUserId, ok := ExtractUserIdFromAccessToken(context)
+	if !ok {
+		return
+	}
+
+	reactionRequestVm := &models.ReactionRequestViewModel{}
+	reactionRequestVm.UserId = extractedUserId
+	err := context.ShouldBindJSON(reactionRequestVm)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse request data"})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{"message": "success"})
 }

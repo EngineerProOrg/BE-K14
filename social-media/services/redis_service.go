@@ -7,11 +7,12 @@ import (
 	"log"
 	"social-media/models"
 	"social-media/repositories/databases"
+	"social-media/utils"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/redis/go-redis/v9"
+	"gorm.io/gorm"
 )
 
 func GenerateSessionId(ginContext *gin.Context, userId int64) (string, error) {
@@ -46,15 +47,28 @@ func GetCachedUserInfo(ginContext *gin.Context, userId int64) (*models.UserProfi
 	val, err := databases.RedisClient.Get(ginContext, key).Result()
 
 	if err != nil {
-		if err == redis.Nil {
-			return nil, fmt.Errorf("user not found in Redis")
+		// Redis could't not find any user then fallback to query db
+		log.Printf("❌ Failed to get from Redis: %v", err)
+		userSigninResponseVm, err := GetUserProfile(userId)
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				// cannot find any user in db, return not found.
+				return nil, utils.ErrUserDoesNotExist
+			}
+			// something else network connection
+			return nil, fmt.Errorf("failed to query user from DB: %w", err)
 		}
-		return nil, fmt.Errorf("failed to get from Redis: %w", err)
+
+		SetCachedUserInfo(ginContext, userId, userSigninResponseVm)
+		return userSigninResponseVm, nil
 	}
 
-	userSigninResponseVm := &models.UserProfileResponseViewModel{}
-	_ = json.Unmarshal([]byte(val), &userSigninResponseVm)
-	return userSigninResponseVm, nil
+	var userSigninResponseVm models.UserProfileResponseViewModel
+	if err := json.Unmarshal([]byte(val), &userSigninResponseVm); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal cached user info: %w", err)
+	}
+
+	return &userSigninResponseVm, nil
 }
 
 func DeleteCachedUserInfo(ctx *gin.Context, userId int64) error {

@@ -30,17 +30,21 @@
 
 ❤️ Like Feature (Inprogress)
 - [] Like Post API
-  POST /posts/:id/like
+  POST /posts/:postId/reaction
 - [] Unlike Post API
-  DELETE /posts/:id/like
+  DELETE /posts/:postId/reaction
 - [] Like Comment API
-  /comments/:id/like
+  POST /posts/:postId/comments/:commentId/reaction
 - [] Unlike comment API
-  /comments/:id/like
-- [] Count Like Numbers of Post/Comment API
-  /posts/:id/likes or GET /comments/:id/likes
+  DELETE /posts/:postId/comments/:commentId/reaction
+- [] Count Likes Post API
+  GET /posts/:postId/reactions
+- [] Count Likes Cmt API
+  GET /posts/:postId/comments/:commentId/reactions
 - [] Check Like Status
-  /posts/:id/like-status
+  GET /posts/:postId/reaction-status
+- [] Check Like Comment
+  GET /posts/:postId/comments/:commentId/reaction-status
 
 🔗 Follow System (Coming soon)
 - [] Follow User API

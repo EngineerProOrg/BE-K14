@@ -79,15 +79,14 @@ func GetUserProfile(context *gin.Context) {
 		return
 	}
 
-	var userSigninResponseVm *models.UserProfileResponseViewModel
-
-	userSigninResponseVm, err = services.GetCachedUserInfo(context, extractedUserId)
+	userSigninResponseVm, err := services.GetCachedUserInfo(context, userId)
 	if err != nil {
-		userSigninResponseVm, err = services.GetUserProfile(userId)
-		if err != nil {
-			context.JSON(http.StatusNotFound, gin.H{"error": err.Error(), "userId": userId})
-			return
+		if errors.Is(err, utils.ErrUserDoesNotExist) {
+			context.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else {
+			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
+		return
 	}
 	context.JSON(http.StatusOK, gin.H{"userProfile": userSigninResponseVm})
 }

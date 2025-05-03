@@ -36,7 +36,7 @@ func InitGormContext() {
 	err = db.AutoMigrate(
 		&models.User{},
 		&models.Post{},
-		&models.Like{},
+		&models.Reaction{},
 		&models.Comment{},
 		&models.Follow{},
 	)
@@ -51,5 +51,5 @@ func InitGormContext() {
 	seedSampleUserData(db)
 	seedSamplePostData(db)
 	seedSampleCommentData(db)
-	seedSampleLikeData(db)
+	seedSampleReactionData(db)
 }

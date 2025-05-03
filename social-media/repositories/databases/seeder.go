@@ -175,10 +175,10 @@ func seedSampleCommentData(db *gorm.DB) {
 	log.Println("✅ Successfully seeded sample comments.")
 }
 
-func seedSampleLikeData(db *gorm.DB) {
+func seedSampleReactionData(db *gorm.DB) {
 	var count int64
-	if err := db.Model(&models.Like{}).Count(&count).Error; err != nil {
-		log.Printf("❌ Failed to count likes: %v\n", err)
+	if err := db.Model(&models.Reaction{}).Count(&count).Error; err != nil {
+		log.Printf("❌ Failed to count reactions: %v\n", err)
 		return
 	}
 
@@ -187,51 +187,51 @@ func seedSampleLikeData(db *gorm.DB) {
 		return
 	}
 
-	likes := []models.Like{
+	reactions := []models.Reaction{
 		// Likes on posts (PostId != nil, CommentId = nil)
-		{UserId: 2, PostId: ptrInt(1), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
-		{UserId: 3, PostId: ptrInt(1), ReactionType: constants.ReactionLove, CreatedAt: time.Now()},
-		{UserId: 1, PostId: ptrInt(2), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
-		{UserId: 4, PostId: ptrInt(3), ReactionType: constants.ReactionSad, CreatedAt: time.Now()},
-		{UserId: 5, PostId: ptrInt(3), ReactionType: constants.ReactionFire, CreatedAt: time.Now()},
+		{UserId: 2, PostId: 1, ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
+		{UserId: 3, PostId: 1, ReactionType: constants.ReactionLove, CreatedAt: time.Now()},
+		{UserId: 1, PostId: 2, ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
+		{UserId: 4, PostId: 3, ReactionType: constants.ReactionSad, CreatedAt: time.Now()},
+		{UserId: 5, PostId: 3, ReactionType: constants.ReactionFire, CreatedAt: time.Now()},
 
-		// Likes on comments (CommentId != nil, PostId = nil)
-		{UserId: 1, CommentId: ptrInt(2), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
-		{UserId: 3, CommentId: ptrInt(3), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
-		{UserId: 4, CommentId: ptrInt(3), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
-		{UserId: 2, CommentId: ptrInt(5), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
+		// Likes on comments (must include both PostId and CommentId)
+		{UserId: 1, PostId: 1, CommentId: ptrInt(2), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
+		{UserId: 3, PostId: 2, CommentId: ptrInt(3), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
+		{UserId: 4, PostId: 2, CommentId: ptrInt(3), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
+		{UserId: 2, PostId: 3, CommentId: ptrInt(5), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
 	}
 
-	if err := db.Create(&likes).Error; err != nil {
-		log.Printf("❌ Failed to seed likes: %v\n", err)
+	if err := db.Create(&reactions).Error; err != nil {
+		log.Printf("❌ Failed to seed reactions: %v\n", err)
 		return
 	}
 
-	log.Println("✅ Successfully seeded sample likes.")
+	log.Println("✅ Successfully seeded sample reactions.")
 }
 
-func ptrInt(i int) *int {
+func ptrInt(i int64) *int64 {
 	return &i
 }
 
 func ClearAllData(db *gorm.DB) {
 	log.Println("🧹 Clearing all tables: Comments → Posts → Users")
 
-	// Xoá comment trước
+	// delete comment first
 	if err := db.Exec("DELETE FROM comments").Error; err != nil {
 		log.Printf("❌ Failed to clear comments: %v\n", err)
 	} else {
 		log.Println("✅ Cleared comments")
 	}
 
-	// Xoá post
+	// delete post
 	if err := db.Exec("DELETE FROM posts").Error; err != nil {
 		log.Printf("❌ Failed to clear posts: %v\n", err)
 	} else {
 		log.Println("✅ Cleared posts")
 	}
 
-	// Xoá user
+	// delete user
 	if err := db.Exec("DELETE FROM users").Error; err != nil {
 		log.Printf("❌ Failed to clear users: %v\n", err)
 	} else {
