@@ -8,8 +8,13 @@ import (
 
 // ViewModel
 type UserSignupRequestViewModel struct {
-	Password string `json:"password" binding:"required"`
+	Password string `json:"password" binding:"required,notblank"`
 	sharedmodels.UserBaseViewModel
+}
+
+type UserSigninRequestViewModel struct {
+	Email    string `json:"email" binding:"required,notblank,email"`
+	Password string `json:"password" binding:"required,notblank"`
 }
 
 type UserProfileResponseViewModel struct {
@@ -47,6 +52,13 @@ func MapUserSignupRequestViewModelToUserDbModel(vm *UserSignupRequestViewModel) 
 		Email:     vm.Email,
 		Username:  utils.GetUsernameFromEmail(vm.Email),
 		Password:  vm.Password,
+	}
+}
+
+func MapUserSigninRequestViewModelToUserDbModel(vm *UserSigninRequestViewModel) *User {
+	return &User{
+		Email:    vm.Email,
+		Password: vm.Password,
 	}
 }
 

@@ -16,6 +16,10 @@ type Comment struct {
 	User      User       `gorm:"foreignKey:UserId"`
 }
 
+type CommentRequestViewModel struct {
+	Content string `json:"content" binding:"required,notblank"`
+}
+
 type CommentResponseViewModel struct {
 	Id        int64                          `json:"id"`
 	Content   string                         `json:"content"`

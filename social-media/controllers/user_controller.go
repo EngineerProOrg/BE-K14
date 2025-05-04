@@ -12,19 +12,15 @@ import (
 )
 
 func Signup(context *gin.Context) {
-	// notes var userSignupViewModel *models.UserSignupViewModel // khai báo con trỏ nhưng chưa gán địa chỉ
-
-	userSignupViewModel := &models.UserSignupRequestViewModel{} // best practice -> Tạo struct mới rồi lấy địa chỉ luôn ->Đã trỏ tới 1 struct rỗng
-
-	err := context.ShouldBindJSON(userSignupViewModel)
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse request data"})
+	// Validate and bind request body
+	userSignupViewModel, ok := utils.BindAndValidate[models.UserSignupRequestViewModel](context)
+	if !ok {
 		return
 	}
 
 	user := models.MapUserSignupRequestViewModelToUserDbModel(userSignupViewModel)
 
-	err = services.Signup(user)
+	err := services.Signup(user)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -33,13 +29,11 @@ func Signup(context *gin.Context) {
 }
 
 func Signin(context *gin.Context) {
-	userInput := &models.User{}
-
-	err := context.ShouldBindJSON(userInput)
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse request data"})
+	userInput, ok := utils.BindAndValidate[models.UserSigninRequestViewModel](context)
+	if !ok {
 		return
 	}
+
 	userSigninResponseVm, err := services.Signin(userInput)
 	if err != nil {
 		if errors.Is(err, utils.ErrInvalidLogin) {
@@ -114,10 +108,8 @@ func EditUserProfile(context *gin.Context) {
 		return
 	}
 
-	editUserProfile := &models.EditUserProfileRequestViewModel{}
-	err = context.ShouldBindJSON(editUserProfile)
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse request data"})
+	editUserProfile, ok := utils.BindAndValidate[models.EditUserProfileRequestViewModel](context)
+	if !ok {
 		return
 	}
 

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"social-media/models"
 	"social-media/services"
+	"social-media/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -31,12 +32,11 @@ func CreateOrUpdateReaction(context *gin.Context) {
 		return
 	}
 
-	reactionRequestVm := &models.ReactionRequestViewModel{}
-	reactionRequestVm.UserId = extractedUserId
-	err := context.ShouldBindJSON(reactionRequestVm)
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse request data"})
+	// Validate and bind request body
+	reactionRequestVm, ok := utils.BindAndValidate[models.ReactionRequestViewModel](context)
+	if !ok {
 		return
 	}
+	reactionRequestVm.UserId = extractedUserId
 	context.JSON(http.StatusOK, gin.H{"message": "success"})
 }

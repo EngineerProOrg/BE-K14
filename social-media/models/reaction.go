@@ -7,10 +7,10 @@ import (
 
 // View Models
 type ReactionRequestViewModel struct {
-	PostId       int64  `json:"postId" binding:"required"`
+	PostId       int64  `json:"postId" binding:"required,notblank"`
 	CommentId    *int64 `json:"commentId"` // allow nullable
 	UserId       int64  `json:"user_id"`
-	ReactionType string `json:"reactionType" binding:"required"`
+	ReactionType string `json:"reactionType" binding:"required,notblank"`
 }
 
 type ReactionCount struct {

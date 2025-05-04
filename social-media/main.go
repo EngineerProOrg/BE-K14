@@ -4,8 +4,11 @@ import (
 	"log"
 	"social-media/repositories/databases"
 	"social-media/routes"
+	"social-media/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 )
 
@@ -13,6 +16,7 @@ func main() {
 	setupMySqlDatabase()
 	setupRedisClient()
 	registerRoutes()
+	registerCustomValidation()
 }
 
 func setupMySqlDatabase() {
@@ -33,4 +37,10 @@ func registerRoutes() {
 	server := gin.Default()
 	routes.RegisterRoutes(server)
 	server.Run(":8080") //localhost:8080
+}
+
+func registerCustomValidation() {
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("notblank", utils.NotBlank)
+	}
 }

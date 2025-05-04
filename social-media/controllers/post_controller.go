@@ -4,33 +4,36 @@ import (
 	"net/http"
 	"social-media/models"
 	"social-media/services"
+	"social-media/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 func CreatePost(context *gin.Context) {
-	postViewModel := &models.PostRequestViewModel{}
-
-	err := context.ShouldBindJSON(postViewModel)
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse request data"})
+	// Validate and bind request body
+	postRequestViewModel, ok := utils.BindAndValidate[models.PostRequestViewModel](context)
+	if !ok {
 		return
 	}
 
+	// Extract userId from token
 	userId, ok := ExtractUserIdFromAccessToken(context)
 	if !ok {
 		return
 	}
 
-	postModel := models.MapPostRequestViewModelToPostDbModel(postViewModel)
+	// Map request vm -> db model
+	postModel := models.MapPostRequestViewModelToPostDbModel(postRequestViewModel)
 	postModel.UserId = userId
 
+	// call service to create post
 	responsePostvm, err := services.CreatePost(postModel)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	// return result
 	context.JSON(http.StatusCreated, gin.H{"post": responsePostvm})
 }
 

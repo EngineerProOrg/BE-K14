@@ -15,8 +15,9 @@ func Signup(user *models.User) error {
 	return repositories.Signup(user)
 }
 
-func Signin(userInput *models.User) (*models.UserProfileResponseViewModel, error) {
-	userModel, err := repositories.Signin(userInput)
+func Signin(userSignRequestVm *models.UserSigninRequestViewModel) (*models.UserProfileResponseViewModel, error) {
+	userDbModel := models.MapUserSigninRequestViewModelToUserDbModel(userSignRequestVm)
+	userModel, err := repositories.Signin(userDbModel)
 	if err != nil {
 		return nil, err
 	}

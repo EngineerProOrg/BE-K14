@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"social-media/models"
 	"social-media/services"
+	"social-media/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -21,16 +22,13 @@ func CreateComment(c *gin.Context) {
 		return
 	}
 
-	var body struct {
-		Content string `json:"content" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	commentRequestViewModel, ok := utils.BindAndValidate[models.CommentRequestViewModel](c)
+	if !ok {
 		return
 	}
 
 	comment := &models.Comment{
-		Content: body.Content,
+		Content: commentRequestViewModel.Content,
 		UserId:  userId,
 		PostId:  postId,
 	}
