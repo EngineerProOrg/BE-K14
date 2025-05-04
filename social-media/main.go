@@ -15,8 +15,8 @@ import (
 func main() {
 	setupMySqlDatabase()
 	setupRedisClient()
-	registerRoutes()
 	registerCustomValidation()
+	registerRoutes()
 }
 
 func setupMySqlDatabase() {
