@@ -59,3 +59,9 @@ func GetPostsByUserId(userId int64) ([]models.Post, error) {
 	}
 	return postEntities, nil
 }
+
+func UpdatePost(postId int64, userId int64, updatedPost *models.Post) error {
+	return databases.GormDb.Model(&models.Post{}).
+		Where("id = ? AND user_id = ?", postId, userId).
+		Updates(updatedPost).Error
+}

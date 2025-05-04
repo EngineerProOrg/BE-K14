@@ -32,6 +32,7 @@ func registerProtectedRoutes(router *gin.RouterGroup) {
 
 	// Post endpoints
 	protected.POST("/posts", controllers.CreatePost)
+	protected.PUT("/posts/:postId", controllers.UpdatePost)
 	protected.GET("/posts/:postId", controllers.GetPostById)
 	protected.GET("/posts", controllers.GetPosts)
 

@@ -3,6 +3,7 @@ package services
 import (
 	"social-media/models"
 	"social-media/repositories"
+	"time"
 )
 
 func CreatePost(post *models.Post) (*models.PostResponseViewModel, error) {
@@ -54,4 +55,11 @@ func GetPostsByUserId(userId int64) ([]*models.PostResponseViewModel, error) {
 		postResponseVm = append(postResponseVm, post.MapPostDbModelToPostResponseViewModel())
 	}
 	return postResponseVm, nil
+}
+
+func UpdatePost(postId int64, userId int64, postRequestViewModel *models.PostRequestViewModel) error {
+	postDbModel := models.MapPostRequestViewModelToPostDbModel(postRequestViewModel)
+	now := time.Now()
+	postDbModel.UpdatedAt = &now
+	return repositories.UpdatePost(postId, userId, postDbModel)
 }

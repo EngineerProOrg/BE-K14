@@ -85,3 +85,42 @@ func GetPostsByUserId(context *gin.Context) {
 
 	context.JSON(http.StatusOK, gin.H{"posts": postResponseVm})
 }
+
+func UpdatePost(c *gin.Context) {
+	postIdParam := c.Param("postId")
+	postId, err := strconv.ParseInt(postIdParam, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid postId"})
+		return
+	}
+	userId, ok := ExtractUserIdFromAccessToken(c)
+	if !ok {
+		return
+	}
+
+	updateReq, ok := utils.BindAndValidate[models.PostRequestViewModel](c)
+	if !ok {
+		return
+	}
+
+	// check post exist
+	postResponseVm, err := services.GetPostById(postId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error(), "postId": postId})
+		return
+	}
+
+	if postResponseVm.Author.UserId != userId {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to update this post"})
+		return
+	}
+
+	err = services.UpdatePost(postId, userId, updateReq)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "updated success"})
+}
