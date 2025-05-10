@@ -42,6 +42,7 @@ func SetCachedUserInfo(ginContext *gin.Context, userId int64, userProfileRespons
 	}
 }
 
+// Cached User Info inside Redis. Therefore, we don't need to call query.
 func GetCachedUserInfo(ginContext *gin.Context, userId int64) (*models.UserProfileResponseViewModel, error) {
 	key := fmt.Sprintf("user_info:%d", userId)
 	val, err := databases.RedisClient.Get(ginContext, key).Result()
