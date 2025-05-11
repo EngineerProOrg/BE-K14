@@ -31,6 +31,7 @@ type Reaction struct {
 	PostId       int64      `gorm:"index:idx_user_post,unique"`
 	CommentId    *int64     `gorm:"index:idx_user_comment,unique"` // for unique constraint with user_id
 	UserId       int64      `gorm:"not null;index:idx_user_post,unique;index:idx_user_comment,unique"`
+	Username     string     `gorm:"column:username;not null"`
 	ReactionType string     `gorm:"column:reaction_type;"`
 	CreatedAt    time.Time  `gorm:"column:created_at;not null"`
 	UpdatedAt    *time.Time `gorm:"column:updated_at;autoUpdateTime:false"`

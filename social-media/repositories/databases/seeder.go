@@ -189,17 +189,17 @@ func seedSampleReactionData(db *gorm.DB) {
 
 	reactions := []models.Reaction{
 		// Likes on posts (PostId != nil, CommentId = nil)
-		{UserId: 2, PostId: 1, ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
-		{UserId: 3, PostId: 1, ReactionType: constants.ReactionLove, CreatedAt: time.Now()},
-		{UserId: 1, PostId: 2, ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
-		{UserId: 4, PostId: 3, ReactionType: constants.ReactionSad, CreatedAt: time.Now()},
-		{UserId: 5, PostId: 3, ReactionType: constants.ReactionFire, CreatedAt: time.Now()},
+		{UserId: 2, PostId: 1, Username: "user002", ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
+		{UserId: 3, PostId: 1, Username: "user003", ReactionType: constants.ReactionLove, CreatedAt: time.Now()},
+		{UserId: 1, PostId: 2, Username: "user001", ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
+		{UserId: 4, PostId: 3, Username: "user004", ReactionType: constants.ReactionSad, CreatedAt: time.Now()},
+		{UserId: 5, PostId: 3, Username: "user005", ReactionType: constants.ReactionFire, CreatedAt: time.Now()},
 
 		// Likes on comments (must include both PostId and CommentId)
-		{UserId: 1, PostId: 1, CommentId: ptrInt(2), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
-		{UserId: 3, PostId: 2, CommentId: ptrInt(3), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
-		{UserId: 4, PostId: 2, CommentId: ptrInt(3), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
-		{UserId: 2, PostId: 3, CommentId: ptrInt(5), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
+		{UserId: 1, PostId: 1, Username: "user001", CommentId: ptrInt(2), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
+		{UserId: 3, PostId: 2, Username: "user003", CommentId: ptrInt(3), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
+		{UserId: 4, PostId: 2, Username: "user004", CommentId: ptrInt(3), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
+		{UserId: 2, PostId: 3, Username: "user002", CommentId: ptrInt(5), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
 	}
 
 	if err := db.Create(&reactions).Error; err != nil {

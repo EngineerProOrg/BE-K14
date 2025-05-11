@@ -9,5 +9,6 @@ type UserBaseViewModel struct {
 	Name      string    `json:"fullName"`
 	Birthday  time.Time `json:"birthday" binding:"required"`
 	Email     string    `json:"email" binding:"required,notblank,email"`
+	Username  string    `json:"username"`
 	Avatar    *string   `json:"avatar"`
 }

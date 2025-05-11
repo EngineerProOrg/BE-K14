@@ -4,15 +4,30 @@ import (
 	"social-media/models"
 	"social-media/repositories"
 	"social-media/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
-func Signup(user *models.User) error {
-	hashedPassword, err := utils.HashPassword(user.Password)
+func Signup(gctx *gin.Context, userSignupRequestVm *models.UserSignupRequestViewModel) error {
+	hashedPassword, err := utils.HashPassword(userSignupRequestVm.Password)
 	if err != nil {
 		return err
 	}
-	user.Password = hashedPassword
-	return repositories.Signup(user)
+
+	userdb := models.MapUserSignupRequestViewModelToUserDbModel(userSignupRequestVm)
+	userdb.Password = hashedPassword
+
+	userdb, err = repositories.Signup(userdb)
+
+	if err != nil {
+		return err
+	}
+
+	userProfileResponseViewModel := userdb.MapUserDbModelToUserProfileResponseViewModel()
+
+	// After signup successfully, we should cache user info into db
+	SetCachedUserInfoByUsername(gctx, userdb.Username, userProfileResponseViewModel)
+	return nil
 }
 
 func Signin(userSignRequestVm *models.UserSigninRequestViewModel) (*models.UserProfileResponseViewModel, error) {
@@ -27,8 +42,17 @@ func Signin(userSignRequestVm *models.UserSigninRequestViewModel) (*models.UserP
 	return userResponse, err
 }
 
-func GetUserProfile(userId int64) (*models.UserProfileResponseViewModel, error) {
-	userModel, err := repositories.GetUserProfile(userId)
+func GetUserProfile(userid int64) (*models.UserProfileResponseViewModel, error) {
+	userModel, err := repositories.GetUserProfile(userid)
+	if err != nil {
+		return nil, err
+	}
+	userResponse := userModel.MapUserDbModelToUserProfileResponseViewModel()
+	return userResponse, err
+}
+
+func GetUserProfileByUsername(username string) (*models.UserProfileResponseViewModel, error) {
+	userModel, err := repositories.GetUserProfileByUsername(username)
 	if err != nil {
 		return nil, err
 	}

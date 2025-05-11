@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"social-media/models"
 	"social-media/services"
@@ -12,25 +13,38 @@ import (
 )
 
 func Signup(context *gin.Context) {
-	// Validate and bind request body
+	// 1) Validate and bind request body
 	userSignupViewModel, ok := utils.BindAndValidate[models.UserSignupRequestViewModel](context)
 	if !ok {
 		return
 	}
 
-	user := models.MapUserSignupRequestViewModelToUserDbModel(userSignupViewModel)
+	// 2) Priorize to get user info from cache. If exist return 409
+	ok = services.CheckUsernameExistInRedis(context, utils.GetUsernameFromEmail(userSignupViewModel.Email))
+	if ok {
+		errorMessage := fmt.Sprintf("email %s has been registered", userSignupViewModel.Email)
+		context.JSON(http.StatusConflict, gin.H{"error": errorMessage})
+		return
+	}
 
-	err := services.Signup(user)
+	err := services.Signup(context, userSignupViewModel)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	context.JSON(http.StatusCreated, gin.H{"userId": user.ID})
+	context.JSON(http.StatusCreated, gin.H{"userId": userSignupViewModel})
 }
 
 func Signin(context *gin.Context) {
 	userInput, ok := utils.BindAndValidate[models.UserSigninRequestViewModel](context)
 	if !ok {
+		return
+	}
+
+	// Priorize to get user info from cache
+	ok = services.CheckUsernameExistInRedis(context, utils.GetUsernameFromEmail(userInput.Email))
+	if !ok {
+		context.JSON(http.StatusNotFound, gin.H{"error": utils.ErrInvalidLogin.Error()})
 		return
 	}
 
@@ -50,9 +64,6 @@ func Signin(context *gin.Context) {
 		return
 	}
 
-	// Cached user_info after login success
-	// Therefore, we can save time to querydb and don't need to call Preload("User")
-	services.SetCachedUserInfo(context, userSigninResponseVm.UserId, userSigninResponseVm)
 	context.JSON(http.StatusOK, gin.H{"message": "success", "access_token": accessToken})
 }
 
@@ -73,7 +84,12 @@ func GetUserProfile(context *gin.Context) {
 		return
 	}
 
-	userSigninResponseVm, err := services.GetCachedUserInfo(context, userId)
+	extractedUsername, ok := ExtractUsernameFromAccessToken(context)
+	if !ok {
+		return
+	}
+
+	userSigninResponseVm, err := services.GetCachedUserInfoByUsername(context, extractedUsername)
 	if err != nil {
 		if errors.Is(err, utils.ErrUserDoesNotExist) {
 			context.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -119,17 +135,17 @@ func EditUserProfile(context *gin.Context) {
 		return
 	}
 	// Set cached
-	services.SetCachedUserInfo(context, userId, updatedProfile)
+	services.SetCachedUserInfoByUsername(context, utils.GetUsernameFromEmail(updatedProfile.Email), updatedProfile)
 	context.JSON(http.StatusOK, gin.H{"userInfo": updatedProfile})
 }
 
 func Signout(context *gin.Context) {
-	userId, ok := ExtractUserIdFromAccessToken(context)
+	username, ok := ExtractUsernameFromAccessToken(context)
 	if !ok {
 		return
 	}
 
-	err := services.DeleteCachedUserInfo(context, userId)
+	err := services.DeleteCachedUserInfo(context, username)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to sign out"})
 		return

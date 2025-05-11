@@ -10,14 +10,17 @@ import (
 	"gorm.io/gorm"
 )
 
-func Signup(user *models.User) error {
+func Signup(user *models.User) (*models.User, error) {
 	email := user.Email
 	isEmailExisted, err := CheckEmailExist(email)
 	if err == nil && isEmailExisted {
-		return fmt.Errorf("email %s has been registered", email)
+		return nil, fmt.Errorf("email %s has been registered", email)
 	}
 
-	return databases.GormDb.Create(user).Error
+	if err := databases.GormDb.Create(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func CheckEmailExist(email string) (bool, error) {
@@ -45,11 +48,19 @@ func Signin(userInput *models.User) (*models.User, error) {
 }
 
 func GetUserProfile(userId int64) (*models.User, error) {
-	// var postEntity *models.Post // will create some unexpected exception.
-
 	// Best practice recommend by AI.
 	user := &models.User{}
 	err := databases.GormDb.First(user, userId).Error
+	if err != nil {
+		return nil, utils.ErrUserDoesNotExist
+	}
+
+	return user, nil
+}
+
+func GetUserProfileByUsername(username string) (*models.User, error) {
+	user := &models.User{}
+	err := databases.GormDb.Where("username = ?", username).First(user).Error
 	if err != nil {
 		return nil, utils.ErrUserDoesNotExist
 	}

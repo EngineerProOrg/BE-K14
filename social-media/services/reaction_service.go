@@ -15,7 +15,7 @@ func GetUserReactionsByPostId(ginCtx *gin.Context, postId int64) ([]*models.User
 
 	reactionVms := make([]*models.UserReactionResponseViewModel, 0, len(reactionDbModels))
 	for _, like := range reactionDbModels {
-		userVm, err := GetCachedUserInfo(ginCtx, like.UserId)
+		userVm, err := GetCachedUserInfoByUsername(ginCtx, like.Username)
 
 		if err != nil {
 			continue

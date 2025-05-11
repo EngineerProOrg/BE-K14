@@ -22,13 +22,15 @@ func Authenticate(context *gin.Context) {
 		accessToken = strings.TrimPrefix(accessToken, "Bearer ")
 	}
 
-	userId, err := utils.VerifyToken(accessToken)
+	userId, username, err := utils.VerifyToken(accessToken)
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
 	// set userid into gin.context
 	context.Set("userId", userId)
+	// set username into gin.context
+	context.Set("username", username)
 
 	// this ensures that next request in line will execute correctly
 	context.Next()
