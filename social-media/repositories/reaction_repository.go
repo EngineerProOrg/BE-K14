@@ -86,6 +86,7 @@ func CountLikes(filter map[string]interface{}) int64 {
 func GetReactionsByPostId(postId int64) ([]models.Reaction, error) {
 	var reactions []models.Reaction
 	err := databases.GormDb.
+		Preload("User").
 		Where("post_id = ? AND comment_id IS NULL", postId).
 		Find(&reactions).Error
 	return reactions, err

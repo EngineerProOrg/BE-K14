@@ -14,14 +14,10 @@ func GetUserReactionsByPostId(ginCtx *gin.Context, postId int64) ([]*models.User
 	}
 
 	reactionVms := make([]*models.UserReactionResponseViewModel, 0, len(reactionDbModels))
-	for _, like := range reactionDbModels {
-		userVm, err := GetCachedUserInfoByUsername(ginCtx, like.Username)
+	for _, reaction := range reactionDbModels {
+		userProfileResponseVm := reaction.User.MapUserDbModelToUserProfileResponseViewModel()
 
-		if err != nil {
-			continue
-		}
-
-		reactionVms = append(reactionVms, like.MapReactionDbModelToUserReactionResponseViewModel(userVm))
+		reactionVms = append(reactionVms, reaction.MapReactionDbModelToUserReactionResponseViewModel(userProfileResponseVm))
 	}
 
 	return reactionVms, nil
