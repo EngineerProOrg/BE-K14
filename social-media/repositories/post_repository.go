@@ -53,7 +53,7 @@ func GetPosts() ([]models.Post, error) {
 func GetPostsByUserId(userId int64) ([]models.Post, error) {
 	var postEntities []models.Post
 
-	err := databases.GormDb.Preload("User").Where("user_id = ?", userId).Find(&postEntities).Error
+	err := databases.GormDb.Where("user_id = ?", userId).Find(&postEntities).Error
 	if err != nil {
 		return nil, fmt.Errorf("post does not exist")
 	}

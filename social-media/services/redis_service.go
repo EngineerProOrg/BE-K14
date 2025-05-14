@@ -28,58 +28,63 @@ func GenerateSessionId(ginContext *gin.Context, userId int64) (string, error) {
 	return sessionID, nil
 }
 
-func SetCachedUserInfoByUsername(ginContext *gin.Context, username string, userProfileResponseVm *models.UserProfileResponseViewModel) {
-	userInfoKey := fmt.Sprintf("user_info:%s", username)
+// Set cached user info by username
+func SetCachedUserInfoByUsername(username string, userProfileResponseVm *models.UserProfileResponseViewModel) {
+	ctx := context.Background()
+	key := fmt.Sprintf("user_info:%s", username)
 
 	jsonBytes, err := json.Marshal(userProfileResponseVm)
 	if err != nil {
-		log.Printf("❌ Failed to marshal author info: %v", err)
+		log.Printf("❌ Failed to marshal user info: %v", err)
 		return
 	}
 
-	err = databases.RedisClient.Set(ginContext, userInfoKey, jsonBytes, time.Hour).Err()
+	err = databases.RedisClient.Set(ctx, key, jsonBytes, time.Hour).Err()
 	if err != nil {
-		log.Printf("❌ Failed to set author info in Redis: %v", err)
+		log.Printf("❌ Failed to set user info in Redis: %v", err)
 	}
 }
 
-// Cached User Info inside Redis. Therefore, we don't need to call query.
-func GetCachedUserInfoByUsername(ginContext *gin.Context, username string) (*models.UserProfileResponseViewModel, error) {
+// Get cached user info, fallback to DB if not found
+func GetCachedUserInfoByUsername(username string) (*models.UserProfileResponseViewModel, error) {
+	ctx := context.Background()
 	key := fmt.Sprintf("user_info:%s", username)
-	val, err := databases.RedisClient.Get(ginContext, key).Result()
 
+	val, err := databases.RedisClient.Get(ctx, key).Result()
 	if err != nil {
-		// Redis could't not find any user then fallback to query db
+		// Redis miss, fallback to DB
 		log.Printf("❌ Failed to get from Redis: %v", err)
-		userSigninResponseVm, err := GetUserProfileByUsername(username)
+		userProfile, err := GetUserProfileByUsername(username)
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
-				// cannot find any user in db, return not found.
 				return nil, utils.ErrUserDoesNotExist
 			}
-			// something else network connection
 			return nil, fmt.Errorf("failed to query user from DB: %w", err)
 		}
-		return userSigninResponseVm, nil
+		return userProfile, nil
 	}
 
-	var userSigninResponseVm models.UserProfileResponseViewModel
-	if err := json.Unmarshal([]byte(val), &userSigninResponseVm); err != nil {
+	var profile models.UserProfileResponseViewModel
+	if err := json.Unmarshal([]byte(val), &profile); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal cached user info: %w", err)
 	}
 
-	return &userSigninResponseVm, nil
+	return &profile, nil
 }
 
-func CheckUsernameExistInRedis(ginContext *gin.Context, username string) bool {
+// Check if username exists in Redis
+func CheckUsernameExistInRedis(username string) bool {
+	ctx := context.Background()
 	key := fmt.Sprintf("user_info:%s", username)
-	_, err := databases.RedisClient.Get(ginContext, key).Result()
+	_, err := databases.RedisClient.Get(ctx, key).Result()
 	return err == nil
 }
 
+// Get user ID from Redis by username
 func GetUserIdByUsernameFromRedis(username string) (int64, error) {
 	ctx := context.Background()
 	key := fmt.Sprintf("user_info:%s", username)
+
 	val, err := databases.RedisClient.Get(ctx, key).Result()
 	if err != nil {
 		return 0, err
@@ -93,12 +98,16 @@ func GetUserIdByUsernameFromRedis(username string) (int64, error) {
 	return profile.UserId, nil
 }
 
-func DeleteCachedUserInfo(ctx *gin.Context, username string) error {
-	userInfoKey := fmt.Sprintf("user_info:%s", username)
-	err := databases.RedisClient.Del(ctx, userInfoKey).Err()
+// Delete cached user info
+func DeleteCachedUserInfo(username string) error {
+	ctx := context.Background()
+	key := fmt.Sprintf("user_info:%s", username)
+
+	err := databases.RedisClient.Del(ctx, key).Err()
 	if err != nil {
 		log.Printf("❌ Failed to delete cached user info for username=%s: %v", username, err)
 		return err
 	}
+
 	return nil
 }

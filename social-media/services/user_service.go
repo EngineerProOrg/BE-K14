@@ -8,10 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Signup(gctx *gin.Context, userSignupRequestVm *models.UserSignupRequestViewModel) error {
+func Signup(gctx *gin.Context, userSignupRequestVm *models.UserSignupRequestViewModel) (*models.UserProfileResponseViewModel, error) {
 	hashedPassword, err := utils.HashPassword(userSignupRequestVm.Password)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	userdb := models.MapUserSignupRequestViewModelToUserDbModel(userSignupRequestVm)
@@ -20,14 +20,14 @@ func Signup(gctx *gin.Context, userSignupRequestVm *models.UserSignupRequestView
 	userdb, err = repositories.Signup(userdb)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	userProfileResponseViewModel := userdb.MapUserDbModelToUserProfileResponseViewModel()
 
 	// After signup successfully, we should cache user info into db
-	SetCachedUserInfoByUsername(gctx, userdb.Username, userProfileResponseViewModel)
-	return nil
+	SetCachedUserInfoByUsername(userdb.Username, userProfileResponseViewModel)
+	return userProfileResponseViewModel, nil
 }
 
 func Signin(userSignRequestVm *models.UserSigninRequestViewModel) (*models.UserProfileResponseViewModel, error) {

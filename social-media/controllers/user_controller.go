@@ -20,19 +20,19 @@ func Signup(context *gin.Context) {
 	}
 
 	// 2) Priorize to get user info from cache. If exist return 409
-	ok = services.CheckUsernameExistInRedis(context, utils.GetUsernameFromEmail(userSignupViewModel.Email))
+	ok = services.CheckUsernameExistInRedis(utils.GetUsernameFromEmail(userSignupViewModel.Email))
 	if ok {
 		errorMessage := fmt.Sprintf("email %s has been registered", userSignupViewModel.Email)
 		context.JSON(http.StatusConflict, gin.H{"error": errorMessage})
 		return
 	}
 
-	err := services.Signup(context, userSignupViewModel)
+	userProfileResponseViewModel, err := services.Signup(context, userSignupViewModel)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	context.JSON(http.StatusCreated, gin.H{"userId": userSignupViewModel})
+	context.JSON(http.StatusCreated, gin.H{"userProfile": userProfileResponseViewModel})
 }
 
 func Signin(context *gin.Context) {
@@ -42,7 +42,7 @@ func Signin(context *gin.Context) {
 	}
 
 	// Priorize to get user info from cache
-	ok = services.CheckUsernameExistInRedis(context, utils.GetUsernameFromEmail(userInput.Email))
+	ok = services.CheckUsernameExistInRedis(utils.GetUsernameFromEmail(userInput.Email))
 	if !ok {
 		context.JSON(http.StatusNotFound, gin.H{"error": utils.ErrInvalidLogin.Error()})
 		return
@@ -80,7 +80,7 @@ func GetUserProfile(context *gin.Context) {
 	}
 
 	if extractedUserId != userId {
-		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: userId mismatch"})
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
@@ -89,7 +89,7 @@ func GetUserProfile(context *gin.Context) {
 		return
 	}
 
-	userSigninResponseVm, err := services.GetCachedUserInfoByUsername(context, extractedUsername)
+	userSigninResponseVm, err := services.GetCachedUserInfoByUsername(extractedUsername)
 	if err != nil {
 		if errors.Is(err, utils.ErrUserDoesNotExist) {
 			context.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -114,7 +114,7 @@ func EditUserProfile(context *gin.Context) {
 	}
 
 	if extractedUserId != userId {
-		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: userId mismatch"})
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
@@ -135,7 +135,7 @@ func EditUserProfile(context *gin.Context) {
 		return
 	}
 	// Set cached
-	services.SetCachedUserInfoByUsername(context, utils.GetUsernameFromEmail(updatedProfile.Email), updatedProfile)
+	services.SetCachedUserInfoByUsername(utils.GetUsernameFromEmail(updatedProfile.Email), updatedProfile)
 	context.JSON(http.StatusOK, gin.H{"userInfo": updatedProfile})
 }
 
@@ -145,7 +145,7 @@ func Signout(context *gin.Context) {
 		return
 	}
 
-	err := services.DeleteCachedUserInfo(context, username)
+	err := services.DeleteCachedUserInfo(username)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to sign out"})
 		return

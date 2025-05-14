@@ -11,17 +11,32 @@ type PostRequestViewModel struct {
 	UserId  int64  `json:"userId"`
 }
 
+type PostWithAuthorViewModel struct {
+	Post   sharedmodels.PostBaseViewModel `json:"post"`
+	Author sharedmodels.UserBaseViewModel `json:"author"`
+}
+
+type PostsWithAuthorResponse struct {
+	Posts []PostWithAuthorViewModel `json:"posts"`
+}
+
 type PostResponseViewModel struct {
-	PostId    int                            `json:"postId"`
-	Title     string                         `json:"title"`
-	Content   string                         `json:"content"`
-	CreatedAt time.Time                      `json:"createdAt"`
-	Author    sharedmodels.UserBaseViewModel `json:"author"`
+	Post sharedmodels.PostBaseViewModel `json:"post"`
+}
+
+type CreatedOrUpdatedPostResponseViewModel struct {
+	Author UserProfileResponseViewModel   `json:"author"`
+	Post   sharedmodels.PostBaseViewModel `json:"post"`
+}
+
+type PostUserResponseViewModel struct {
+	Author UserProfileResponseViewModel `json:"author"`
+	Posts  []PostResponseViewModel      `json:"posts"`
 }
 
 // Db model
 type Post struct {
-	Id        int        `gorm:"primaryKey;column:id"`
+	Id        int64      `gorm:"primaryKey;column:id"`
 	Title     string     `gorm:"column:title;size:500;not null"`
 	Content   string     `gorm:"column:content;type:text"`
 	UserId    int64      `gorm:"column:user_id;not null"`
@@ -41,10 +56,38 @@ func MapPostRequestViewModelToPostDbModel(vm *PostRequestViewModel) *Post {
 
 func (p *Post) MapPostDbModelToPostResponseViewModel() *PostResponseViewModel {
 	return &PostResponseViewModel{
-		PostId:    p.Id,
-		Title:     p.Title,
-		Content:   p.Content,
-		CreatedAt: p.CreatedAt,
+		Post: sharedmodels.PostBaseViewModel{
+			PostId:    p.Id,
+			Title:     p.Title,
+			Content:   p.Content,
+			CreatedAt: p.CreatedAt,
+			UpdateAt:  p.UpdatedAt,
+		},
+	}
+}
+
+func (p *Post) MapPostDbModelToCreatedPostResponseViewModel(author *UserProfileResponseViewModel) *CreatedOrUpdatedPostResponseViewModel {
+	return &CreatedOrUpdatedPostResponseViewModel{
+		Author: *author,
+		Post: sharedmodels.PostBaseViewModel{
+			PostId:    p.Id,
+			Title:     p.Title,
+			Content:   p.Content,
+			CreatedAt: p.CreatedAt,
+			UpdateAt:  p.UpdatedAt,
+		},
+	}
+}
+
+func (p *Post) MapPostDbModelToPostWithAuthorViewModel() *PostWithAuthorViewModel {
+	return &PostWithAuthorViewModel{
+		Post: sharedmodels.PostBaseViewModel{
+			PostId:    p.Id,
+			Title:     p.Title,
+			Content:   p.Content,
+			CreatedAt: p.CreatedAt,
+			UpdateAt:  p.UpdatedAt,
+		},
 		Author: sharedmodels.UserBaseViewModel{
 			UserId:    p.UserId,
 			FirstName: p.User.FirstName,
@@ -52,6 +95,7 @@ func (p *Post) MapPostDbModelToPostResponseViewModel() *PostResponseViewModel {
 			Name:      p.User.Name,
 			Birthday:  p.User.Birthday,
 			Email:     p.User.Email,
+			Username:  p.User.Username,
 			Avatar:    p.User.Avatar,
 		},
 	}

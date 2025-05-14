@@ -23,18 +23,23 @@ func CreatePost(context *gin.Context) {
 		return
 	}
 
+	username, ok := ExtractUsernameFromAccessToken(context)
+	if !ok {
+		return
+	}
+
 	// Map request vm -> db model
 	postModel := models.MapPostRequestViewModelToPostDbModel(postRequestViewModel)
 	postModel.UserId = userId
 
 	// call service to create post
-	responsePostvm, err := services.CreatePost(postModel)
+	responsePostvm, err := services.CreatePost(username, postModel)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	// return result
-	context.JSON(http.StatusCreated, gin.H{"post": responsePostvm})
+	context.JSON(http.StatusCreated, responsePostvm)
 }
 
 func GetPostById(context *gin.Context) {
@@ -49,7 +54,7 @@ func GetPostById(context *gin.Context) {
 		context.JSON(http.StatusNotFound, gin.H{"error": err.Error(), "postId": postId})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"post": postResponse})
+	context.JSON(http.StatusOK, postResponse)
 }
 
 func GetPosts(context *gin.Context) {
@@ -59,7 +64,7 @@ func GetPosts(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"posts": posts})
+	context.JSON(http.StatusOK, posts)
 }
 
 func GetPostsByUserId(context *gin.Context) {
@@ -68,22 +73,27 @@ func GetPostsByUserId(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "userId": userId})
 		return
 	}
+
 	extractedUserId, ok := ExtractUserIdFromAccessToken(context)
 	if !ok {
 		return
 	}
 	if extractedUserId != userId {
-		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: userId mismatch"})
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	extractedUsername, ok := ExtractUsernameFromAccessToken(context)
+	if !ok {
 		return
 	}
 
-	postResponseVm, err := services.GetPostsByUserId(userId)
+	postResponseVm, err := services.GetPostsByUserId(userId, extractedUsername)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"posts": postResponseVm})
+	context.JSON(http.StatusOK, postResponseVm)
 }
 
 func UpdatePost(c *gin.Context) {

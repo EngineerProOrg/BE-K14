@@ -6,55 +6,71 @@ import (
 	"time"
 )
 
-func CreatePost(post *models.Post) (*models.PostResponseViewModel, error) {
+func CreatePost(username string, post *models.Post) (*models.CreatedOrUpdatedPostResponseViewModel, error) {
 	postModel, err := repositories.CreatePost(post)
 	if err != nil {
 		return nil, err
 	}
-	postResponseVm := postModel.MapPostDbModelToPostResponseViewModel()
+
+	author, err := GetCachedUserInfoByUsername(username)
+	if err != nil {
+		return nil, err
+	}
+
+	postResponseVm := postModel.MapPostDbModelToCreatedPostResponseViewModel(author)
 	return postResponseVm, nil
 }
 
-func GetPostById(postId int64) (*models.PostResponseViewModel, error) {
+func GetPostById(postId int64) (*models.CreatedOrUpdatedPostResponseViewModel, error) {
 	postModel, err := repositories.GetPostById(postId)
 	if err != nil {
 		return nil, err
 	}
 
-	postResponseVm := postModel.MapPostDbModelToPostResponseViewModel()
+	author := postModel.User.MapUserDbModelToUserProfileResponseViewModel()
+
+	postResponseVm := postModel.MapPostDbModelToCreatedPostResponseViewModel(author)
 	return postResponseVm, nil
 }
 
-func GetPosts() ([]*models.PostResponseViewModel, error) {
+func GetPosts() (*models.PostsWithAuthorResponse, error) {
 	postModels, err := repositories.GetPosts()
 	if err != nil {
 		return nil, err
 	}
 
-	postResponses := make([]*models.PostResponseViewModel, 0, len(postModels))
+	postResponses := make([]models.PostWithAuthorViewModel, 0, len(postModels))
 	for _, post := range postModels {
-		postResponses = append(postResponses, post.MapPostDbModelToPostResponseViewModel())
+		vm := post.MapPostDbModelToPostWithAuthorViewModel()
+		postResponses = append(postResponses, *vm)
 	}
 
-	return postResponses, nil
+	return &models.PostsWithAuthorResponse{
+		Posts: postResponses,
+	}, nil
 }
 
-func GetPostsByUserId(userId int64) ([]*models.PostResponseViewModel, error) {
-	_, err := repositories.CheckUserExist(userId)
+func GetPostsByUserId(userId int64, username string) (*models.PostUserResponseViewModel, error) {
+	postEntities, err := repositories.GetPostsByUserId(userId)
 	if err != nil {
 		return nil, err
 	}
 
-	postEntites, err := repositories.GetPostsByUserId(userId)
+	author, err := GetCachedUserInfoByUsername(username)
 	if err != nil {
 		return nil, err
 	}
 
-	postResponseVm := make([]*models.PostResponseViewModel, 0, len(postEntites))
-	for _, post := range postEntites {
-		postResponseVm = append(postResponseVm, post.MapPostDbModelToPostResponseViewModel())
+	postResponseVm := make([]models.PostResponseViewModel, 0, len(postEntities))
+	for _, post := range postEntities {
+		postVmPtr := post.MapPostDbModelToPostResponseViewModel()
+		postResponseVm = append(postResponseVm, *postVmPtr)
 	}
-	return postResponseVm, nil
+
+	return &models.PostUserResponseViewModel{
+		Author: *author,
+		Posts:  postResponseVm,
+	}, nil
 }
 
 func UpdatePost(postId int64, userId int64, postRequestViewModel *models.PostRequestViewModel) error {

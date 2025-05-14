@@ -88,6 +88,7 @@ func (u *User) MapUserDbModelToUserProfileResponseViewModel() *UserProfileRespon
 			Name:      u.Name,
 			Birthday:  u.Birthday,
 			Email:     u.Email,
+			Username:  u.Username,
 			Avatar:    u.Avatar,
 		},
 	}

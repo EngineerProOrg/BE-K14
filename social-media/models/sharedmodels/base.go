@@ -12,3 +12,11 @@ type UserBaseViewModel struct {
 	Username  string    `json:"username"`
 	Avatar    *string   `json:"avatar"`
 }
+
+type PostBaseViewModel struct {
+	PostId    int64      `json:"postId"`
+	Title     string     `json:"title"`
+	Content   string     `json:"content"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdateAt  *time.Time `json:"updatedAt"`
+}
