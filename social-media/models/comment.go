@@ -2,6 +2,7 @@ package models
 
 import (
 	"social-media/models/sharedmodels"
+	"social-media/utils"
 	"time"
 )
 
@@ -17,7 +18,11 @@ type Comment struct {
 }
 
 type CommentRequestViewModel struct {
-	Content string `json:"content" binding:"required,notblank"`
+	UserId    int64
+	PostId    int64
+	CommentId int64
+	Content   string `json:"content" binding:"required,notblank"`
+	Username  string
 }
 
 type CommentResponseViewModel struct {
@@ -28,20 +33,30 @@ type CommentResponseViewModel struct {
 	Author    sharedmodels.UserBaseViewModel `json:"author"`
 }
 
-func (c *Comment) CreateMappingCommentEntityAndCommentResponseViewModel() *CommentResponseViewModel {
+func MapCommentRequestViewModelToCommentDbModel(commentRequestViewModel *CommentRequestViewModel) *Comment {
+	return &Comment{
+		Id:      commentRequestViewModel.CommentId,
+		Content: commentRequestViewModel.Content,
+		UserId:  commentRequestViewModel.UserId,
+		PostId:  commentRequestViewModel.PostId,
+	}
+}
+
+func (c *Comment) MapCommentEntityAndCommentResponseViewModel(author *UserProfileResponseViewModel) *CommentResponseViewModel {
 	return &CommentResponseViewModel{
 		Id:        c.Id,
 		Content:   c.Content,
 		CreatedAt: c.CreatedAt,
 		UpdateAt:  c.UpdatedAt,
 		Author: sharedmodels.UserBaseViewModel{
-			UserId:    c.UserId,
-			FirstName: c.User.FirstName,
-			LastName:  c.User.LastName,
-			Name:      c.User.Name,
-			Birthday:  c.User.Birthday,
-			Email:     c.User.Email,
-			Avatar:    c.User.Avatar,
+			UserId:    author.UserId,
+			FirstName: author.FirstName,
+			LastName:  author.LastName,
+			Name:      author.Name,
+			Birthday:  author.Birthday,
+			Email:     author.Email,
+			Username:  utils.GetUsernameFromEmail(author.Email),
+			Avatar:    author.Avatar,
 		},
 	}
 }
