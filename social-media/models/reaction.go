@@ -7,35 +7,35 @@ import (
 
 // View Models
 type ReactionRequestViewModel struct {
-	PostId       int64  `json:"postId" binding:"required,notblank"`
-	CommentId    *int64 `json:"commentId"` // allow nullable
-	UserId       int64  `json:"user_id"`
+	TargetId     int64  `json:"targetId" binding:"required"`
+	TargetType   string `json:"targetType" binding:"required,notblank"`
+	UserId       int64  `json:"userId"`
 	ReactionType string `json:"reactionType" binding:"required,notblank"`
 }
 
-type ReactionCount struct {
-	ReactionType string
-	Count        int64
+type ReactionResponseViewModelCount struct {
+	ReactionType string `json:"reactionType"`
+	Count        int64  `json:"count"`
 }
 
 type UserReactionResponseViewModel struct {
-	UserId       int64   `json:"user_id"`
-	UserName     string  `json:"user_name"`
-	AvatarUrl    *string `json:"avatar_url"`
-	ReactionType string  `json:"reaction_type"`
+	UserId       int64   `json:"userId"`
+	UserName     string  `json:"username"`
+	AvatarUrl    *string `json:"avatarUrl"`
+	ReactionType string  `json:"reactionType"`
 }
 
 // Db models
 type Reaction struct {
 	Id           int64      `gorm:"primaryKey"`
-	PostId       int64      `gorm:"index:idx_user_post,unique"`
-	CommentId    *int64     `gorm:"index:idx_user_comment,unique"` // for unique constraint with user_id
-	UserId       int64      `gorm:"not null;index:idx_user_post,unique;index:idx_user_comment,unique"`
-	ReactionType string     `gorm:"column:reaction_type;"`
-	CreatedAt    time.Time  `gorm:"column:created_at;not null"`
-	UpdatedAt    *time.Time `gorm:"column:updated_at;autoUpdateTime:false"`
+	TargetId     int64      `gorm:"not null;index:idx_user_target,priority:1"`
+	TargetType   string     `gorm:"not null;index:idx_user_target,priority:2"`
+	UserId       int64      `gorm:"not null;index:idx_user_target,priority:3"`
+	ReactionType string     `gorm:"not null"`
+	CreatedAt    time.Time  `gorm:"not null"`
+	UpdatedAt    *time.Time `gorm:"autoUpdateTime:false"`
 
-	User User `gorm:"foreignKey:UserId"`
+	User User `gorm:"foreignKey:UserId;references:ID"`
 }
 
 func (r *Reaction) MapReactionDbModelToUserReactionResponseViewModel(userVm *UserProfileResponseViewModel) *UserReactionResponseViewModel {
@@ -49,8 +49,8 @@ func (r *Reaction) MapReactionDbModelToUserReactionResponseViewModel(userVm *Use
 
 func MapReactionRequestViewModelToReactionDbModel(reactionRequestVm *ReactionRequestViewModel) *Reaction {
 	return &Reaction{
-		PostId:       reactionRequestVm.PostId,
-		CommentId:    reactionRequestVm.CommentId,
+		TargetId:     reactionRequestVm.TargetId,
+		TargetType:   reactionRequestVm.TargetType,
 		UserId:       reactionRequestVm.UserId,
 		ReactionType: reactionRequestVm.ReactionType,
 		CreatedAt:    time.Now(),

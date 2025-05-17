@@ -183,23 +183,24 @@ func seedSampleReactionData(db *gorm.DB) {
 	}
 
 	if count > 0 {
-		log.Println("✅ Likes table already has data. Skipping seeding.")
+		log.Println("✅ Reactions table already has data. Skipping seeding.")
 		return
 	}
 
+	now := time.Now()
 	reactions := []models.Reaction{
-		// Likes on posts (PostId != nil, CommentId = nil)
-		{UserId: 2, PostId: 1, ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
-		{UserId: 3, PostId: 1, ReactionType: constants.ReactionLove, CreatedAt: time.Now()},
-		{UserId: 1, PostId: 2, ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
-		{UserId: 4, PostId: 3, ReactionType: constants.ReactionSad, CreatedAt: time.Now()},
-		{UserId: 5, PostId: 3, ReactionType: constants.ReactionFire, CreatedAt: time.Now()},
+		// 👍 Likes on posts (TargetType = "post")
+		{UserId: 2, TargetId: 1, TargetType: "post", ReactionType: constants.ReactionLike, CreatedAt: now},
+		{UserId: 3, TargetId: 1, TargetType: "post", ReactionType: constants.ReactionLove, CreatedAt: now},
+		{UserId: 1, TargetId: 2, TargetType: "post", ReactionType: constants.ReactionHaha, CreatedAt: now},
+		{UserId: 4, TargetId: 3, TargetType: "post", ReactionType: constants.ReactionSad, CreatedAt: now},
+		{UserId: 5, TargetId: 3, TargetType: "post", ReactionType: constants.ReactionFire, CreatedAt: now},
 
-		// Likes on comments (must include both PostId and CommentId)
-		{UserId: 1, PostId: 1, CommentId: ptrInt(2), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
-		{UserId: 3, PostId: 2, CommentId: ptrInt(3), ReactionType: constants.ReactionLike, CreatedAt: time.Now()},
-		{UserId: 4, PostId: 2, CommentId: ptrInt(3), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
-		{UserId: 2, PostId: 3, CommentId: ptrInt(5), ReactionType: constants.ReactionHaha, CreatedAt: time.Now()},
+		// 💬 Likes on comments (TargetType = "comment")
+		{UserId: 1, TargetId: 2, TargetType: "comment", ReactionType: constants.ReactionLike, CreatedAt: now},
+		{UserId: 3, TargetId: 3, TargetType: "comment", ReactionType: constants.ReactionLike, CreatedAt: now},
+		{UserId: 4, TargetId: 3, TargetType: "comment", ReactionType: constants.ReactionHaha, CreatedAt: now},
+		{UserId: 2, TargetId: 5, TargetType: "comment", ReactionType: constants.ReactionHaha, CreatedAt: now},
 	}
 
 	if err := db.Create(&reactions).Error; err != nil {
@@ -208,10 +209,6 @@ func seedSampleReactionData(db *gorm.DB) {
 	}
 
 	log.Println("✅ Successfully seeded sample reactions.")
-}
-
-func ptrInt(i int64) *int64 {
-	return &i
 }
 
 func ClearAllData(db *gorm.DB) {

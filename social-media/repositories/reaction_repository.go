@@ -9,96 +9,61 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateOrUpdateReaction(like *models.Reaction) error {
+func CreateOrUpdateReaction(reaction *models.Reaction) error {
 	var existing models.Reaction
 
-	query := databases.GormDb.Model(&models.Reaction{}).Where("user_id = ?", like.UserId)
-	if like.CommentId != nil {
-		query = query.Where("comment_id = ?", *like.CommentId)
-	} else {
-		query = query.Where("post_id = ?", like.PostId).Where("comment_id IS NULL")
-	}
+	err := databases.GormDb.Model(&models.Reaction{}).
+		Where("user_id = ? AND target_id = ? AND target_type = ?", reaction.UserId, reaction.TargetId, reaction.TargetType).
+		First(&existing).Error
 
-	err := query.First(&existing).Error
+	// if record not found, add new record into db
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		// No existing reaction → insert
-		return databases.GormDb.Create(like).Error
+		return databases.GormDb.Create(reaction).Error
 	}
 
-	if existing.ReactionType == like.ReactionType {
-		// Click same icon → remove
+	if existing.ReactionType == reaction.ReactionType {
 		return databases.GormDb.Delete(&existing).Error
 	}
 
-	// Different icon → update
+	// if record found and user changes reaction, updated new reaction
 	return databases.GormDb.Model(&existing).Updates(map[string]interface{}{
-		"reaction_type": like.ReactionType,
+		"reaction_type": reaction.ReactionType,
 		"updated_at":    time.Now(),
 	}).Error
 }
 
-func DeleteReaction(userId int64, postId int, commentId *int) error {
-	query := databases.GormDb.Where("user_id = ?", userId)
-	if commentId != nil {
-		query = query.Where("comment_id = ?", *commentId)
-	} else {
-		query = query.Where("post_id = ?", postId).Where("comment_id IS NULL")
-	}
-	return query.Delete(&models.Reaction{}).Error
+func DeleteReaction(userId int64, targetId int64, targetType string) error {
+	return databases.GormDb.
+		Where("user_id = ? AND target_id = ? AND target_type = ?", userId, targetId, targetType).
+		Delete(&models.Reaction{}).Error
 }
 
-func CountAllPostLikes() (int64, error) {
+func CountReactions(targetId int64, targetType string) (int64, error) {
 	var count int64
-	err := databases.GormDb.Model(&models.Reaction{}).Where("post_id IS NOT NULL AND comment_id IS NULL").Count(&count).Error
-	if err != nil {
-		return 0, err
-	}
-	return count, nil
+	err := databases.GormDb.
+		Model(&models.Reaction{}).
+		Where("target_id = ? AND target_type = ?", targetId, targetType).
+		Count(&count).Error
+	return count, err
 }
 
-func CountLikesByPostId(postId int64) (int64, error) {
-	var count int64
-	err := databases.GormDb.Model(&models.Reaction{}).Where("post_id = ? AND comment_id IS NULL", postId).Count(&count).Error
-	if err != nil {
-		return 0, err
-	}
-	return count, nil
-}
-
-func CountLikesByCommentId(commentId int64) (int64, error) {
-	var count int64
-	err := databases.GormDb.Model(&models.Reaction{}).Where("comment_id = ? AND comment_id IS NULL", commentId).Count(&count).Error
-	if err != nil {
-		return 0, err
-	}
-	return count, nil
-}
-
-func CountLikes(filter map[string]interface{}) int64 {
-	var count int64
-	err := databases.GormDb.Model(&models.Reaction{}).Where(filter).Count(&count).Error
-	if err != nil {
-		return 0
-	}
-	return count
-}
-
-func GetReactionsByPostId(postId int64) ([]models.Reaction, error) {
+func GetReactionsByTarget(targetId int64, targetType string) ([]models.Reaction, error) {
 	var reactions []models.Reaction
 	err := databases.GormDb.
 		Preload("User").
-		Where("post_id = ? AND comment_id IS NULL", postId).
+		Where("target_id = ? AND target_type = ?", targetId, targetType).
 		Find(&reactions).Error
 	return reactions, err
 }
 
-func CountReactionsByPostId(postId int64) ([]models.ReactionCount, error) {
-	var results []models.ReactionCount
+func CountGroupedReactionsByTarget(targetId int64, targetType string) ([]models.ReactionResponseViewModelCount, error) {
+	var results []models.ReactionResponseViewModelCount
 
 	err := databases.GormDb.Model(&models.Reaction{}).
 		Select("reaction_type, COUNT(*) as count").
-		Where("post_id = ? AND comment_id IS NULL", postId).
+		Where("target_id = ? AND target_type = ?", targetId, targetType).
 		Group("reaction_type").
 		Scan(&results).Error
+
 	return results, err
 }

@@ -40,6 +40,8 @@ func registerProtectedRoutes(router *gin.RouterGroup) {
 	protected.POST("/posts/:postId/comments", controllers.CreateComment)
 	protected.GET("/posts/:postId/comments", controllers.GetCommentsByPostId)
 
-	// Like endpoints
-	protected.POST("/posts/:postId/reactions", controllers.GetReactionsByPostId)
+	// Reaction endpoints
+	protected.GET("/reactions/:targetId", controllers.GetReactionsByTarget) // use query param: ?target_type=post|comment
+	protected.POST("/reactions", controllers.CreateOrUpdateReaction)
+	protected.GET("/reactions/:targetId/grouped", controllers.CountGroupedReactionsByTarget) // use query param: ?target_type=post|comment
 }
