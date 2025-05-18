@@ -1,62 +1,62 @@
+# 🧠 Mini Social Media App (Golang Backend)
+
+A RESTful API built in Go for a simplified social media platform, including user authentication, post creation, commenting, reactions, and more.
+
+---
+
+## 🚀 How to Run
+
+```bash
+go run main.go
+
 ✅ Project Progress Checklist
-🔐 User Authentication
-- [x] Signup API with password hashing
-  POST /users/signup
-- [x] Signin API with JWT token generation
-  POST /users/signin
-- [x] JWT Authorization middleware to protect routes
+🔐 Authentication & User
+[X] User Signup
+[X] User Signin (JWT generation)
+[X] JWT Middleware for protected routes
+[X] Get current user profile
+[X] Update user profile
 
-📝 Post Management
-- [x] Create Post API
-  POST /posts
-- [x] Get Post by ID API
-  GET /posts/:postId
-- [x] Get Posts by User ID API
-  GET /users/:userId/posts
-- [x] Get All Posts API
-  GET /posts
+📝 Posts
+[X] Create Post
+[X] Get Post by ID
+[X] Get Posts by UserID
+[X] Update Post
 
-👤 User Profile
-- [x] Get current user profile API
-  GET /users/profile/:userId
-- [x] Update user profile API
-  PUT /users/profile/:userId
+💬 Comments
+[X] Create Comment
+[X] Get Comments by PostID
+[X] Update Comment
+[X] Delete Comment (optional)
 
-💬 Comment System
-- [X] Create Comment API
-  POST /posts/:postId/comments
-- [X] Get Comments by Post ID API
-  GET /posts/:postId/comments
+👍 Reactions (Like/Heart/Other)
+[X] Create or Update Reaction
+[X] Get Reactions by Target (post)
+[X] Count Reactions by Type
 
-❤️ Like Feature (Inprogress)
-- [] Like Post API
-  POST /posts/:postId/reaction
-- [] Unlike Post API
-  DELETE /posts/:postId/reaction
-- [] Like Comment API
-  POST /posts/:postId/comments/:commentId/reaction
-- [] Unlike comment API
-  DELETE /posts/:postId/comments/:commentId/reaction
-- [] Count Likes Post API
-  GET /posts/:postId/reactions
-- [] Count Likes Cmt API
-  GET /posts/:postId/comments/:commentId/reactions
-- [] Check Like Status
-  GET /posts/:postId/reaction-status
-- [] Check Like Comment
-  GET /posts/:postId/comments/:commentId/reaction-status
+➕ Social Features
+ Follow / Unfollow User
 
-🔗 Follow System (Coming soon)
-- [] Follow User API
-- [] Unfollow User API
+ Get Newsfeed (posts from followed users)
 
-📰 Newsfeed (Coming soon)
-- [] Get Newsfeed from followed users API
+🛠️ Other Features
+[X] Seeder for sample data
+[X] Redis Client Connection
+[X] Custom error handling (e.g. ErrUserDoesNotExist, ErrCommentNotInPost)
 
-⚙️ Other Features
-- [x] Data Seeder for testing
-- [x] Redis client setup
-- [] Redis caching for performance (optional)
-- [] Pagination for listing posts and comments
-- [] Input validation for requests
-- [] Consistent error handling and responses
+ Input validation (e.g. required fields, min/max length)
+
+ Pagination for post & comment listing
+
+ Unit tests (optional)
+
+🚧 Advanced Optimization (To be done later)
+These are performance/scale-related tasks planned for later phase:
+
+ Redis Caching for posts/newsfeed
+
+ Async job processing (goroutines, channels)
+
+ Database query optimization (indexing, joins)
+
+ Pub/Sub architecture or CQRS pattern
