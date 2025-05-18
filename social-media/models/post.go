@@ -6,9 +6,10 @@ import (
 )
 
 type PostRequestViewModel struct {
-	Title   string `json:"title" binding:"required,notblank"`
-	Content string `json:"content" binding:"required,notblank"`
-	UserId  int64  `json:"userId"`
+	Title    string `json:"title" binding:"required,notblank"`
+	Content  string `json:"content" binding:"required,notblank"`
+	UserId   int64  `json:"userId"`
+	Username string `json:"username"`
 }
 
 type PostWithAuthorViewModel struct {

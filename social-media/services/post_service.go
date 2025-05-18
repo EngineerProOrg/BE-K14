@@ -6,13 +6,15 @@ import (
 	"time"
 )
 
-func CreatePost(username string, post *models.Post) (*models.CreatedOrUpdatedPostResponseViewModel, error) {
-	postModel, err := repositories.CreatePost(post)
+func CreatePost(postRequestVm *models.PostRequestViewModel) (*models.CreatedOrUpdatedPostResponseViewModel, error) {
+	// Get user from Redis Cache, so that we don't need to Preload("User")
+	author, err := GetCachedUserInfoByUsername(postRequestVm.Username)
 	if err != nil {
 		return nil, err
 	}
 
-	author, err := GetCachedUserInfoByUsername(username)
+	postModel := models.MapPostRequestViewModelToPostDbModel(postRequestVm)
+	postModel, err = repositories.CreatePost(postModel)
 	if err != nil {
 		return nil, err
 	}

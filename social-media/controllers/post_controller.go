@@ -28,12 +28,11 @@ func CreatePost(context *gin.Context) {
 		return
 	}
 
-	// Map request vm -> db model
-	postModel := models.MapPostRequestViewModelToPostDbModel(postRequestViewModel)
-	postModel.UserId = userId
+	postRequestViewModel.UserId = userId
+	postRequestViewModel.Username = username
 
 	// call service to create post
-	responsePostvm, err := services.CreatePost(username, postModel)
+	responsePostvm, err := services.CreatePost(postRequestViewModel)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

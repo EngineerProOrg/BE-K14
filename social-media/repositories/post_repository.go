@@ -12,10 +12,6 @@ func CreatePost(post *models.Post) (*models.Post, error) {
 		return nil, err
 	}
 
-	err = databases.GormDb.Preload("User").First(post, post.Id).Error
-	if err != nil {
-		return nil, err
-	}
 	return post, nil
 }
 
