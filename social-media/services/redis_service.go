@@ -9,23 +9,21 @@ import (
 	"social-media/models"
 	"social-media/repositories/databases"
 	"social-media/utils"
+	"strconv"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
-func GenerateSessionId(ginContext *gin.Context, userId int64) (string, error) {
-	sessionID := uuid.NewString()
+type RedisService struct {
+	rdb *redis.Client
+}
 
-	err := databases.RedisClient.Set(ginContext, "session_id:"+sessionID, userId, time.Hour).Err()
-	log.Printf("✅ New session created: %s for %d", sessionID, userId)
-
-	if err != nil {
-		return "", errors.New("could not store session in Redis")
+func NewRedisService() *RedisService {
+	return &RedisService{
+		rdb: databases.RedisClient,
 	}
-	return sessionID, nil
 }
 
 // Set cached user info by username
@@ -109,5 +107,54 @@ func DeleteCachedUserInfo(username string) error {
 		return err
 	}
 
+	return nil
+}
+
+func (r *RedisService) CacheFollow(followerID, followingID int64) error {
+	fkey := fmt.Sprintf("user:%d:following", followerID)
+	bkey := fmt.Sprintf("user:%d:followers", followingID)
+	if err := r.rdb.SAdd(ctx, fkey, followingID).Err(); err != nil {
+		return err
+	}
+	if err := r.rdb.SAdd(ctx, bkey, followerID).Err(); err != nil {
+		return err
+	}
+	r.rdb.Expire(ctx, fkey, time.Hour*6)
+	r.rdb.Expire(ctx, bkey, time.Hour*6)
+	return nil
+}
+
+func (r *RedisService) RemoveFollowCache(followerID, followingID int64) error {
+	fkey := fmt.Sprintf("user:%d:following", followerID)
+	bkey := fmt.Sprintf("user:%d:followers", followingID)
+	if err := r.rdb.SRem(ctx, fkey, followingID).Err(); err != nil {
+		return err
+	}
+	if err := r.rdb.SRem(ctx, bkey, followerID).Err(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RedisService) GetCachedFollowings(userID int64) ([]int64, error) {
+	key := fmt.Sprintf("user:%d:following", userID)
+	ids, err := r.rdb.SMembers(ctx, key).Result()
+	if err != nil {
+		return nil, err
+	}
+	var result []int64
+	for _, idStr := range ids {
+		id, _ := strconv.ParseInt(idStr, 10, 64)
+		result = append(result, id)
+	}
+	return result, nil
+}
+
+func (r *RedisService) CacheFollowingsBulk(userID int64, ids []int64) error {
+	key := fmt.Sprintf("user:%d:following", userID)
+	for _, id := range ids {
+		r.rdb.SAdd(ctx, key, id)
+	}
+	r.rdb.Expire(ctx, key, time.Hour*6)
 	return nil
 }

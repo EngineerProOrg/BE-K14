@@ -211,6 +211,35 @@ func seedSampleReactionData(db *gorm.DB) {
 	log.Println("✅ Successfully seeded sample reactions.")
 }
 
+func seedSampleFollowData(db *gorm.DB) {
+	var count int64
+	if err := db.Model(&models.Follow{}).Count(&count).Error; err != nil {
+		log.Printf("❌ Failed to count follows: %v\n", err)
+		return
+	}
+	if count > 0 {
+		log.Println("✅ Follow table already has data. Skipping seeding.")
+		return
+	}
+
+	now := time.Now()
+	follows := []models.Follow{
+		{FollowerId: 1, FollowingId: 2, CreatedAt: now},
+		{FollowerId: 1, FollowingId: 3, CreatedAt: now},
+		{FollowerId: 2, FollowingId: 1, CreatedAt: now},
+		{FollowerId: 3, FollowingId: 4, CreatedAt: now},
+		{FollowerId: 3, FollowingId: 5, CreatedAt: now},
+		{FollowerId: 4, FollowingId: 1, CreatedAt: now},
+		{FollowerId: 5, FollowingId: 2, CreatedAt: now},
+	}
+
+	if err := db.Create(&follows).Error; err != nil {
+		log.Printf("❌ Failed to seed follows: %v\n", err)
+		return
+	}
+	log.Println("✅ Successfully seeded sample follows.")
+}
+
 func ClearAllData(db *gorm.DB) {
 	log.Println("🧹 Clearing all tables: Comments → Posts → Users")
 
