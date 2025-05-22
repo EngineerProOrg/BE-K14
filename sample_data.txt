@@ -1,0 +1,4 @@
+1|Tom|Software engineer|1995
+2|John Snow|Teacher|1997
+3|Maria Onitsuka|Actor|1993
+4|Emil|Football player|1987
