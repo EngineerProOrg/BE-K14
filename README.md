@@ -1,1 +1,3 @@
-# BE-K14
+```cmd
+go run file_handler.go
+```
