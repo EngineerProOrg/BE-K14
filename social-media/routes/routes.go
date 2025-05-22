@@ -46,7 +46,7 @@ func registerProtectedRoutes(router *gin.RouterGroup) {
 	protected.POST("/reactions", controllers.CreateOrUpdateReaction)
 	protected.GET("/reactions/:targetId/grouped", controllers.CountGroupedReactionsByTarget) // use query param: ?target_type=post|comment
 
-	protected.POST("/friends/:user_id", controllers.FollowUser)
-	protected.DELETE("/friends/:user_id", controllers.UnfollowUser)
-	protected.GET("/friends/:user_id", controllers.GetFollowings)
+	protected.POST("follow/friends/:userId", controllers.FollowUser)
+	protected.DELETE("follow/friends/:userId", controllers.UnfollowUser)
+	protected.GET("follow/friends/:userId", controllers.GetFollowings)
 }

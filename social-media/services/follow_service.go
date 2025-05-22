@@ -3,29 +3,30 @@ package services
 import (
 	"context"
 	"social-media/repositories"
+	"social-media/services/redisservice"
 )
 
 var ctx = context.Background()
 
 type FollowService struct {
-	followRepository repositories.FollowRepository
-	redisService     *RedisService
+	followRepository   repositories.FollowRepository
+	redisFollowService *redisservice.RedisFollowService
 }
 
 func NewFollowService() *FollowService {
 	return &FollowService{
-		followRepository: repositories.NewFollowRepository(),
-		redisService:     NewRedisService(), // assume already initialized
+		followRepository:   repositories.NewFollowRepository(),
+		redisFollowService: redisservice.NewFollowRedisService(), // assume already initialized
 	}
 }
 
-func (s *FollowService) Follow(followerID, followingID int64) error {
-	err := s.followRepository.Follow(followerID, followingID)
+func (followService *FollowService) Follow(followerID, followingID int64) error {
+	err := followService.followRepository.Follow(followerID, followingID)
 	if err != nil {
 		return err
 	}
 	// Redis update
-	return s.redisService.CacheFollow(followerID, followingID)
+	return followService.redisFollowService.CacheFollow(followerID, followingID)
 }
 
 func (s *FollowService) Unfollow(followerID, followingID int64) error {
@@ -34,11 +35,11 @@ func (s *FollowService) Unfollow(followerID, followingID int64) error {
 		return err
 	}
 	// Redis update
-	return s.redisService.RemoveFollowCache(followerID, followingID)
+	return s.redisFollowService.RemoveFollowCache(followerID, followingID)
 }
 
 func (s *FollowService) GetFollowings(userID int64) ([]int64, error) {
-	cached, err := s.redisService.GetCachedFollowings(userID)
+	cached, err := s.redisFollowService.GetCachedFollowings(userID)
 	if err == nil && len(cached) > 0 {
 		return cached, nil
 	}
@@ -47,6 +48,6 @@ func (s *FollowService) GetFollowings(userID int64) ([]int64, error) {
 	if err != nil {
 		return nil, err
 	}
-	_ = s.redisService.CacheFollowingsBulk(userID, followings)
+	_ = s.redisFollowService.CacheFollowingsBulk(userID, followings)
 	return followings, nil
 }

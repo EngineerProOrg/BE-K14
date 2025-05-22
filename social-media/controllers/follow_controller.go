@@ -11,8 +11,12 @@ import (
 var followService = services.NewFollowService()
 
 func FollowUser(c *gin.Context) {
-	followerID := c.GetInt64("userId")
-	targetIDStr := c.Param("user_id")
+	followerID, ok := ExtractUserIdFromAccessToken(c)
+	if !ok {
+		return
+	}
+
+	targetIDStr := c.Param("userId")
 	targetID, err := strconv.ParseInt(targetIDStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
@@ -28,8 +32,11 @@ func FollowUser(c *gin.Context) {
 }
 
 func UnfollowUser(c *gin.Context) {
-	followerID := c.GetInt64("userId")
-	targetIDStr := c.Param("user_id")
+	followerID, ok := ExtractUserIdFromAccessToken(c)
+	if !ok {
+		return
+	}
+	targetIDStr := c.Param("userId")
 	targetID, err := strconv.ParseInt(targetIDStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
@@ -45,7 +52,7 @@ func UnfollowUser(c *gin.Context) {
 }
 
 func GetFollowings(c *gin.Context) {
-	userIDStr := c.Param("user_id")
+	userIDStr := c.Param("userId")
 	userID, err := strconv.ParseInt(userIDStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})

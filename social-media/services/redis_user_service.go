@@ -9,19 +9,18 @@ import (
 	"social-media/models"
 	"social-media/repositories/databases"
 	"social-media/utils"
-	"strconv"
 	"time"
 
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
-type RedisService struct {
+type RedisUserService struct {
 	rdb *redis.Client
 }
 
-func NewRedisService() *RedisService {
-	return &RedisService{
+func NewRedisUserService() *RedisUserService {
+	return &RedisUserService{
 		rdb: databases.RedisClient,
 	}
 }
@@ -107,54 +106,5 @@ func DeleteCachedUserInfo(username string) error {
 		return err
 	}
 
-	return nil
-}
-
-func (r *RedisService) CacheFollow(followerID, followingID int64) error {
-	fkey := fmt.Sprintf("user:%d:following", followerID)
-	bkey := fmt.Sprintf("user:%d:followers", followingID)
-	if err := r.rdb.SAdd(ctx, fkey, followingID).Err(); err != nil {
-		return err
-	}
-	if err := r.rdb.SAdd(ctx, bkey, followerID).Err(); err != nil {
-		return err
-	}
-	r.rdb.Expire(ctx, fkey, time.Hour*6)
-	r.rdb.Expire(ctx, bkey, time.Hour*6)
-	return nil
-}
-
-func (r *RedisService) RemoveFollowCache(followerID, followingID int64) error {
-	fkey := fmt.Sprintf("user:%d:following", followerID)
-	bkey := fmt.Sprintf("user:%d:followers", followingID)
-	if err := r.rdb.SRem(ctx, fkey, followingID).Err(); err != nil {
-		return err
-	}
-	if err := r.rdb.SRem(ctx, bkey, followerID).Err(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *RedisService) GetCachedFollowings(userID int64) ([]int64, error) {
-	key := fmt.Sprintf("user:%d:following", userID)
-	ids, err := r.rdb.SMembers(ctx, key).Result()
-	if err != nil {
-		return nil, err
-	}
-	var result []int64
-	for _, idStr := range ids {
-		id, _ := strconv.ParseInt(idStr, 10, 64)
-		result = append(result, id)
-	}
-	return result, nil
-}
-
-func (r *RedisService) CacheFollowingsBulk(userID int64, ids []int64) error {
-	key := fmt.Sprintf("user:%d:following", userID)
-	for _, id := range ids {
-		r.rdb.SAdd(ctx, key, id)
-	}
-	r.rdb.Expire(ctx, key, time.Hour*6)
 	return nil
 }
