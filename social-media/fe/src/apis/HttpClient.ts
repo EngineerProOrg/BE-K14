@@ -1,13 +1,21 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
-import { SignInRequestViewModel, SignInResponseViewModel } from '../models/user';
+import axios, { AxiosError } from "axios";
+import {
+  SignInRequestViewModel,
+  SignInResponseViewModel,
+} from "../models/user";
+import { ErrorResponseViewModel } from "../models/error";
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080/api/v1',
+  baseURL: "http://localhost:8080/api/v1",
   withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
 });
 
 const sleep = (delay: number) =>
-  new Promise(resolve => setTimeout(resolve, delay));
+  new Promise((resolve) => setTimeout(resolve, delay));
 
 axiosInstance.interceptors.response.use(
   async (response) => {
@@ -17,30 +25,24 @@ axiosInstance.interceptors.response.use(
   (error: AxiosError) => {
     const { response } = error;
 
-    if (!response) throw error;
+    const customError =
+      response?.data &&
+      typeof response.data === "object" &&
+      "error" in response.data
+        ? (response.data as ErrorResponseViewModel).error
+        : "Undefined error from server";
 
-    if (response.status === 404) {
-      console.error('404 Not Found');
-    }
-
-    throw error;
+    return Promise.reject(customError);
   }
 );
 
-axiosInstance.interceptors.response.use(
-  (response) => response.data,
-  (error) => Promise.reject(error)
-);
-
-
-const Auth = {
+const User = {
   SignIn: (body: SignInRequestViewModel): Promise<SignInResponseViewModel> =>
-    axiosInstance.post('/users/signin', body),
+    axiosInstance.post("/users/signin", body),
 };
 
-
 const HttpClient = {
-  Auth
+  User,
 };
 
 export default HttpClient;

@@ -10,23 +10,25 @@ const AuthContext = createContext<AuthContextViewModel | null>(null);
 export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({
   children,
 }) => {
-  const [user, setUser] = useState<UserInfo | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   const signIn = (signinResponseViewModel: SignInResponseViewModel) => {
-    setToken(signinResponseViewModel.accessToken);
-    setUser(signinResponseViewModel.userInfo);
-    localStorage.setItem("accessToken", signinResponseViewModel.accessToken);
+    if (signinResponseViewModel) {
+      setAccessToken(signinResponseViewModel.accessToken);
+      setUserInfo(signinResponseViewModel.userInfo);
+      localStorage.setItem("accessToken", signinResponseViewModel.accessToken);
+    }
   };
 
   const signOut = () => {
-    setUser(null);
-    setToken(null);
+    setUserInfo(null);
+    setAccessToken(null);
     localStorage.removeItem("accessToken");
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, signIn, signOut }}>
+    <AuthContext.Provider value={{ user: userInfo, token: accessToken, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
