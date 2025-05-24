@@ -64,7 +64,7 @@ func Signin(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": "success", "access_token": accessToken})
+	context.JSON(http.StatusOK, gin.H{"accessToken": accessToken, "userInfo": userSigninResponseVm})
 }
 
 func GetUserProfile(context *gin.Context) {

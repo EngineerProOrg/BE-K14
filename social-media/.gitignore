@@ -44,3 +44,9 @@ dump.rdb
 # Ignore compiled Go binaries (if in root)
 main
 social-media
+
+# Frontend
+fe/node_modules/
+fe/build/
+fe/.env
+fe/package-lock.json
