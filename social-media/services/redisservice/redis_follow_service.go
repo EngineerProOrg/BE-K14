@@ -17,7 +17,10 @@ type RedisFollowService struct {
 	rdb *redis.Client
 }
 
-func NewFollowRedisService() *RedisFollowService {
+func NewRedisFollowService() *RedisFollowService {
+	if databases.RedisClient == nil {
+		fmt.Print("❌ RedisClient is nil! Remember to call InitRedisClient() in main.go")
+	}
 	return &RedisFollowService{
 		rdb: databases.RedisClient,
 	}

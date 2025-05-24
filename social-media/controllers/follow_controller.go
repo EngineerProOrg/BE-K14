@@ -8,9 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var followService = services.NewFollowService()
-
 func FollowUser(c *gin.Context) {
+	var followService = services.NewFollowService()
+
 	followerID, ok := ExtractUserIdFromAccessToken(c)
 	if !ok {
 		return
@@ -32,6 +32,8 @@ func FollowUser(c *gin.Context) {
 }
 
 func UnfollowUser(c *gin.Context) {
+	var followService = services.NewFollowService()
+
 	followerID, ok := ExtractUserIdFromAccessToken(c)
 	if !ok {
 		return
@@ -52,6 +54,8 @@ func UnfollowUser(c *gin.Context) {
 }
 
 func GetFollowings(c *gin.Context) {
+	var followService = services.NewFollowService()
+
 	userIDStr := c.Param("userId")
 	userID, err := strconv.ParseInt(userIDStr, 10, 64)
 	if err != nil {

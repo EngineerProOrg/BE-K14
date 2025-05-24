@@ -16,7 +16,7 @@ type FollowService struct {
 func NewFollowService() *FollowService {
 	return &FollowService{
 		followRepository:   repositories.NewFollowRepository(),
-		redisFollowService: redisservice.NewFollowRedisService(), // assume already initialized
+		redisFollowService: redisservice.NewRedisFollowService(), // assume already initialized
 	}
 }
 
