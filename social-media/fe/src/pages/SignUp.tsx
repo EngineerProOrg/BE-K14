@@ -1,46 +1,43 @@
-import { useForm } from "react-hook-form";
+// File: src/pages/SignUp.tsx
 import {
   Button,
+  TextField,
   Box,
   Typography,
-  CircularProgress,
   Container,
   CssBaseline,
   Avatar,
-  TextField,
+  CircularProgress,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
-import { SignInRequestViewModel } from "../models/user";
+import { useForm } from "react-hook-form";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useState } from "react";
-import HttpClient from "../apis/HttpClient";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
+import { SignUpRequestViewModel } from "../models/user";
 
 const theme = createTheme();
 
-export default function SignIn() {
+export default function SignUp() {
   const [isSubmitting, setSubmitting] = useState(false);
-  const [signInError, setSignInError] = useState<string | null>(null);
+  const [signUpError, setSignUpError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignInRequestViewModel>();
+  } = useForm<SignUpRequestViewModel>();
 
-  const { signIn } = useAuth();
   const navigate = useNavigate();
 
-  const onSubmit = async (signinRequestViewModel: SignInRequestViewModel) => {
+  const onSubmit = async (data: SignUpRequestViewModel) => {
     setSubmitting(true);
     try {
-      const response = await HttpClient.User.SignIn(signinRequestViewModel);
-
-      signIn(response);
+      //await HttpClient.User.SignUp(data);
+      navigate("/signin");
     } catch (err) {
-      setSignInError(String(err));
       console.error(err);
+      setSignUpError(String(err));
     } finally {
       setSubmitting(false);
     }
@@ -50,7 +47,6 @@ export default function SignIn() {
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
-
         <Box
           sx={{
             marginTop: 8,
@@ -63,7 +59,7 @@ export default function SignIn() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Sign up
           </Typography>
           <Box
             component="form"
@@ -71,13 +67,38 @@ export default function SignIn() {
             sx={{ mt: 1 }}
           >
             <TextField
-              margin="normal"
               fullWidth
-              label="Email Address"
-              autoComplete="email"
-              autoFocus
-              error={!!errors.email}
-              helperText={errors.email?.message}
+              margin="normal"
+              label="First name"
+              {...register("firstName", {
+                required: "First name is required",
+                minLength: {
+                  value: 2,
+                  message: "First name must contain at least 2 characters",
+                },
+              })}
+              error={!!errors.firstName}
+              helperText={errors.firstName?.message}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Last name"
+              {...register("lastName", {
+                required: "Last name is required",
+                minLength: {
+                  value: 2,
+                  message: "Last name must contain at least 2 characters",
+                },
+              })}
+              error={!!errors.lastName}
+              helperText={errors.lastName?.message}
+            />
+
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Email"
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -85,15 +106,14 @@ export default function SignIn() {
                   message: "Invalid email",
                 },
               })}
+              error={!!errors.email}
+              helperText={errors.email?.message}
             />
             <TextField
-              margin="normal"
               fullWidth
+              margin="normal"
               label="Password"
               type="password"
-              autoComplete="current-password"
-              error={!!errors.password}
-              helperText={errors.password?.message}
               {...register("password", {
                 required: "Password is required",
                 minLength: {
@@ -101,29 +121,25 @@ export default function SignIn() {
                   message: "Password must contain at least 6 characters",
                 },
               })}
+              error={!!errors.password}
+              helperText={errors.password?.message}
             />
-            {signInError && (
+            {signUpError && (
               <Typography variant="body2" color="error" mt={1}>
-                {signInError}
+                {signUpError}
               </Typography>
             )}
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
               disabled={isSubmitting}
+              sx={{ mt: 3, mb: 2 }}
               startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
             >
-              {isSubmitting ? "Signin..." : "Sign In"}
+              {isSubmitting ? "Signing up..." : "Sign Up"}
             </Button>
           </Box>
-          <Typography variant="body2" align="center">
-            Don't have an account?{" "}
-            <Link to="/signup" style={{ textDecoration: "none" }}>
-              Sign up
-            </Link>
-          </Typography>
         </Box>
       </Container>
     </ThemeProvider>

@@ -25,3 +25,12 @@ export interface SignInRequestViewModel {
   email: string;
   password: string;
 }
+
+export interface SignUpRequestViewModel {
+  firstName: string;
+  lastName: string;
+  birthday: Date;
+  email: string;
+  password: string;
+  avatar: string;
+}
