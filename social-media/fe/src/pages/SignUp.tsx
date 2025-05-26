@@ -9,12 +9,17 @@ import {
   Avatar,
   CircularProgress,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useState } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { SignUpRequestViewModel } from "../models/user";
+
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import HttpClient from "../apis/HttpClient";
 
 const theme = createTheme();
 
@@ -25,15 +30,24 @@ export default function SignUp() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
-  } = useForm<SignUpRequestViewModel>();
+  } = useForm<SignUpRequestViewModel>({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      birthday: undefined,
+    },
+  });
 
   const navigate = useNavigate();
 
   const onSubmit = async (data: SignUpRequestViewModel) => {
     setSubmitting(true);
     try {
-      //await HttpClient.User.SignUp(data);
+      await HttpClient.User.SignUp(data);
       navigate("/signin");
     } catch (err) {
       console.error(err);
@@ -94,6 +108,30 @@ export default function SignUp() {
               error={!!errors.lastName}
               helperText={errors.lastName?.message}
             />
+
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <Controller
+                name="birthday"
+                control={control}
+                rules={{ required: "Birthday is required" }}
+                render={({ field }) => (
+                  <DatePicker
+                    label="Birthday"
+                    value={field.value ? new Date(field.value) : null}
+                    onChange={(date) => field.onChange(date)}
+                    format="dd/MMM/yy"
+                    slotProps={{
+                      textField: {
+                        margin: "normal",
+                        fullWidth: true,
+                        error: !!errors.birthday,
+                        helperText: errors.birthday?.message,
+                      },
+                    }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
 
             <TextField
               fullWidth

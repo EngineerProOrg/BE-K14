@@ -22,7 +22,7 @@ func Signup(context *gin.Context) {
 	// 2) Priorize to get user info from cache. If exist return 409
 	ok = services.CheckUsernameExistInRedis(utils.GetUsernameFromEmail(userSignupViewModel.Email))
 	if ok {
-		errorMessage := fmt.Sprintf("email %s has been registered", userSignupViewModel.Email)
+		errorMessage := fmt.Sprintf("Email %s has been registered", userSignupViewModel.Email)
 		context.JSON(http.StatusConflict, gin.H{"error": errorMessage})
 		return
 	}

@@ -2,6 +2,8 @@ import axios, { AxiosError } from "axios";
 import {
   SignInRequestViewModel,
   SignInResponseViewModel,
+  SignUpRequestViewModel,
+  UserInfo,
 } from "../models/user";
 import { ErrorResponseViewModel } from "../models/error";
 
@@ -9,8 +11,8 @@ const axiosInstance = axios.create({
   baseURL: "http://localhost:8080/api/v1",
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
 });
 
@@ -37,8 +39,10 @@ axiosInstance.interceptors.response.use(
 );
 
 const User = {
-  SignIn: (body: SignInRequestViewModel): Promise<SignInResponseViewModel> =>
-    axiosInstance.post("/users/signin", body),
+  SignIn: (signInRequestViewModel: SignInRequestViewModel): Promise<SignInResponseViewModel> =>
+    axiosInstance.post("/users/signin", signInRequestViewModel),
+  SignUp: (signUpRequestViewModel: SignUpRequestViewModel): Promise<UserInfo> =>
+    axiosInstance.post("/users/signup", signUpRequestViewModel),
 };
 
 const HttpClient = {

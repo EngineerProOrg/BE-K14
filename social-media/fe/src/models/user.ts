@@ -29,7 +29,7 @@ export interface SignInRequestViewModel {
 export interface SignUpRequestViewModel {
   firstName: string;
   lastName: string;
-  birthday: Date;
+  birthday: Date | undefined;
   email: string;
   password: string;
   avatar: string;
