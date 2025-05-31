@@ -1,16 +1,16 @@
 export interface AuthContextViewModel {
-  user: UserInfo | null;
+  user: UserBaseViewModel | null;
   token: string | null;
   signIn: (data: SignInResponseViewModel) => void;
   signOut: () => void;
 }
 
 export interface SignInResponseViewModel {
-  userInfo: UserInfo;
+  userInfo: UserBaseViewModel;
   accessToken: string;
 }
 
-export interface UserInfo {
+export interface UserBaseViewModel {
   userId: number;
   firstName: string;
   lastName: string;

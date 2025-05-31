@@ -1,4 +1,3 @@
-// File: src/pages/SignUp.tsx
 import {
   Button,
   TextField,
@@ -11,7 +10,7 @@ import {
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { SignUpRequestViewModel } from "../models/user";
@@ -21,6 +20,7 @@ import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DatePicker from "@mui/lab/DatePicker";
 
 import HttpClient from "../apis/HttpClient";
+import { useAuth } from "../contexts/AuthContext";
 
 const theme = createTheme();
 
@@ -44,6 +44,13 @@ export default function SignUp() {
   });
 
   const navigate = useNavigate();
+  const { token } = useAuth();
+
+  useEffect(() => {
+    if (token) {
+      navigate("/posts");
+    }
+  }, [token]);
 
   const onSubmit = async (data: SignUpRequestViewModel) => {
     setSubmitting(true);

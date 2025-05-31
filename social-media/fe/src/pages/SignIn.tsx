@@ -13,7 +13,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { SignInRequestViewModel } from "../models/user";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import HttpClient from "../apis/HttpClient";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
@@ -31,6 +31,13 @@ export default function SignIn() {
 
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const { token } = useAuth();
+ 
+  useEffect(() => {
+    if (token) {
+      navigate("/posts");
+    }
+  }, [token]);
 
   const onSubmit = async (signinRequestViewModel: SignInRequestViewModel) => {
     setSubmitting(true);
@@ -38,7 +45,7 @@ export default function SignIn() {
       const response = await HttpClient.User.SignIn(signinRequestViewModel);
 
       signIn(response);
-      navigate("/posts")
+      navigate("/posts");
     } catch (err) {
       setSignInError(String(err));
     } finally {

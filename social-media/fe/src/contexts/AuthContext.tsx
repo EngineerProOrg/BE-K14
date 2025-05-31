@@ -1,8 +1,8 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   AuthContextViewModel,
   SignInResponseViewModel,
-  UserInfo,
+  UserBaseViewModel,
 } from "../models/user";
 
 const AuthContext = createContext<AuthContextViewModel | null>(null);
@@ -10,8 +10,16 @@ const AuthContext = createContext<AuthContextViewModel | null>(null);
 export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({
   children,
 }) => {
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<UserBaseViewModel | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  // Get access token from local storage
+  useEffect(() => {
+    const tokenInStorage = localStorage.getItem("accessToken");
+    if (tokenInStorage) {
+      setAccessToken(tokenInStorage);      
+    }
+  }, []);
 
   const signIn = (signinResponseViewModel: SignInResponseViewModel) => {
     if (signinResponseViewModel) {
@@ -28,7 +36,9 @@ export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ user: userInfo, token: accessToken, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user: userInfo, token: accessToken, signIn, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );
