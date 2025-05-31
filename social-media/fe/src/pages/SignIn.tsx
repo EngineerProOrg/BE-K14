@@ -38,9 +38,9 @@ export default function SignIn() {
       const response = await HttpClient.User.SignIn(signinRequestViewModel);
 
       signIn(response);
+      navigate("/posts")
     } catch (err) {
       setSignInError(String(err));
-      console.error(err);
     } finally {
       setSubmitting(false);
     }

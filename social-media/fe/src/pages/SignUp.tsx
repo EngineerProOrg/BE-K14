@@ -16,9 +16,10 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { SignUpRequestViewModel } from "../models/user";
 
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import DatePicker from "@mui/lab/DatePicker";
+
 import HttpClient from "../apis/HttpClient";
 
 const theme = createTheme();
@@ -118,9 +119,9 @@ export default function SignUp() {
                   <DatePicker
                     label="Birthday"
                     value={field.value ? new Date(field.value) : null}
-                    onChange={(date) => field.onChange(date)}
+                    onChange={(date: Date | null) => field.onChange(date)}
                     format="dd/MMM/yy"
-                    slotProps={{
+                    renderInput={{
                       textField: {
                         margin: "normal",
                         fullWidth: true,

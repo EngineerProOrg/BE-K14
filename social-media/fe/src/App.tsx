@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import SignIn from "./pages/SignIn";
 import Layout from "./components/Layout";
-import Main from "./components/Main";
+import Main from "./components/posts/PostCardList";
 import SignUp from "./pages/SignUp";
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route
-            path="/feed"
+            path="/posts"
             element={
               <Layout>
                 <Main />
