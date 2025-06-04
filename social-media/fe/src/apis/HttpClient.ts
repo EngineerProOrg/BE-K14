@@ -7,6 +7,8 @@ import {
 } from "../models/user";
 import { ErrorResponseViewModel } from "../models/error";
 import { PostsWithAuthorResponse } from "../models/post";
+import { CommentResponseViewModel } from "../models/comment";
+import { UserReactionResponseViewModel } from "../models/reaction";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8080/api/v1",
@@ -33,23 +35,26 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-
 axiosInstance.interceptors.response.use(
   async (response) => {
     await sleep(300);
     return response.data;
   },
   (error: AxiosError) => {
-    const { response } = error;
+    const status = error.response?.status;
+    const data = error.response?.data;
 
-    const customError =
-      response?.data &&
-      typeof response.data === "object" &&
-      "error" in response.data
-        ? (response.data as ErrorResponseViewModel).error
-        : "Undefined error from server";
+    if (status === 401) {
+      localStorage.removeItem("accessToken");
+      window.location.href = "/signin";
+    }
 
-    return Promise.reject(customError);
+    const message =
+      typeof data === "object" && data && "error" in data
+        ? (data as ErrorResponseViewModel).error
+        : "Something went wrong";
+
+    return Promise.reject(new Error(message));
   }
 );
 
@@ -70,9 +75,28 @@ const Post = {
   },
 };
 
+const Comment = {
+  GetCommentsByPostId: (postId: number): Promise<CommentResponseViewModel> => {
+    return axiosInstance.get(`/posts/${postId}/comments`);
+  },
+};
+
+const Reaction = {
+  GetReactionsByTarget: (
+    targetId: number,
+    targetType: "post" | "comment"
+  ): Promise<UserReactionResponseViewModel> => {
+    return axiosInstance.get(`/reactions/${targetId}`, {
+      params: { target_type: targetType },
+    });
+  },
+};
+
 const HttpClient = {
   User,
-  Post
+  Post,
+  Comment,
+  Reaction
 };
 
 export default HttpClient;

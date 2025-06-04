@@ -17,7 +17,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({
   useEffect(() => {
     const tokenInStorage = localStorage.getItem("accessToken");
     if (tokenInStorage) {
-      setAccessToken(tokenInStorage);      
+      setAccessToken(tokenInStorage);
     }
   }, []);
 
@@ -48,4 +48,13 @@ export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
+};
+
+export const isValidToken = (token: string): boolean => {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
 };
