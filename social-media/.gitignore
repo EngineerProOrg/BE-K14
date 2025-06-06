@@ -1,0 +1,52 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, coverage reports
+*.test
+*.out
+
+# Go build artifacts
+/bin/
+/build/
+/dist/
+
+# Dependency directories (vendor/)
+vendor/
+
+# Logs and debug output
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Docker
+*.env
+docker-compose.override.yml
+
+# Redis data (if any)
+dump.rdb
+*.rdb
+*.aof
+
+# Ignore API test files
+*.http
+
+# Ignore compiled Go binaries (if in root)
+main
+social-media
+
+# Frontend
+fe/node_modules/
+fe/build/
+fe/.env
+fe/package-lock.json
