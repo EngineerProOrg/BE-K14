@@ -1,7 +1,7 @@
-package social_network
+package main
 
-import ()
+import "fmt"
 
 func main() {
-
+	fmt.Print("Hello, Social Network!\n")
 }
