@@ -1,0 +1,18 @@
+package user;
+
+option go_package = "ep.k14/newsfeed/internal/handler/proto/user";
+
+service UserService {
+  rpc Signup(SignupRequest) returns (SignupResponse) {}
+}
+
+message SignupRequest {
+  required string user_name = 1;
+  required string password = 2;
+  required string display_name = 3;
+}
+
+message SignupResponse {
+  required string user_name = 1;
+  required string display_name = 2;
+}
