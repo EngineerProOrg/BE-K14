@@ -2,14 +2,32 @@ package main
 
 import (
 	"fmt"
+	"log"
 
+	"ep.k14/newsfeed/internal/dai/user_dai"
 	"ep.k14/newsfeed/internal/handler/user_grpc"
 	"ep.k14/newsfeed/internal/service/user_service"
 )
 
 func main() {
 	// create db conn -> db access object
-	userService, _ := user_service.New()
+	userDai, err := user_dai.New(&user_dai.UserDbConfig{
+		Username:     "root",
+		Password:     "123456",
+		Host:         "localhost",
+		Port:         3306,
+		DatabaseName: "newsfeed",
+	})
+	if err != nil {
+		log.Println("err init user dai", err)
+		return
+	}
+
+	userService, err := user_service.New(userDai)
+	if err != nil {
+		log.Println("err init user service", err)
+		return
+	}
 
 	userGrpcServer, err := user_grpc.New(userService)
 	if err != nil {
