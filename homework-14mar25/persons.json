@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Tom",
+    "jobTitle": "Software engineer",
+    "yearOfBirth": 1995
+  },
+  {
+    "name": "John Snow",
+    "jobTitle": "Teacher",
+    "yearOfBirth": 1997
+  },
+  {
+    "name": "Maria Onitsuka",
+    "jobTitle": "Actor",
+    "yearOfBirth": 1993
+  },
+  {
+    "name": "Emily",
+    "jobTitle": "Football player",
+    "yearOfBirth": 1987
+  },
+  {
+    "name": "Khanh Vuong Bui",
+    "jobTitle": "Senior .NET Developer",
+    "yearOfBirth": 1992
+  }
+]
