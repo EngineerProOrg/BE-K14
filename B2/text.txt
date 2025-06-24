@@ -1,0 +1,5 @@
+Tom|Software engineer|1995
+AN|Teacher|1997
+Maria Onitsuka|Actor|1993
+Emil|Football player|1987
+An|Plumber|1987
